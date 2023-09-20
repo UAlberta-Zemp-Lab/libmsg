@@ -1,6 +1,6 @@
 /* See LICENSE file for copyright and license details. */
 #include <msg/msg.h>
-#include <msg/msgstream/unistd.h>
+#include <msg/unistd.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <unistd.h>

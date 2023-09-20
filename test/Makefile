@@ -10,8 +10,8 @@ all: tests
 
 tests: unistd
 
-unistd: $(MSGOBJ) utils.o unistd-test.o ../src/msgstream/unistd/unistd.o
-	$(CC) $(CFLAGS) $(INCS) $(MSGOBJ) utils.o unistd-test.o ../src/msgstream/unistd/unistd.o -o $@
+unistd: $(MSGOBJ) utils.o unistd-test.o ../src/unistd/unistd.o
+	$(CC) $(CFLAGS) $(INCS) $(MSGOBJ) utils.o unistd-test.o ../src/unistd/unistd.o -o $@
 
 clean:
-	rm *.o $(MSGOBJ) ../src/msgstream/unistd/unistd.o
+	rm *.o $(MSGOBJ) ../src/unistd/unistd.o
