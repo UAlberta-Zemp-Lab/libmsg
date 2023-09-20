@@ -48,11 +48,11 @@ assert_msg_equal_impl(const char *file, int line, Msg *m1, Msg *m2)
 void
 dump_msg(Msg *m)
 {
-	fprintf(stderr, "m: .type = 0x%04x; .length = 0x%04x; .data = 0x",
-	        m->type, m->length);
+	printf("m: .type = 0x%04x; .length = 0x%04x; .data = 0x", m->type,
+	       m->length);
 
 	uint8_t *d = m->data;
 	for (size_t i = 0; i < m->length; i++)
-		fprintf(stderr, "%02x ", d[i]);
-	fputs("\n", stderr);
+		printf("%02x ", d[i]);
+	fputc('\n', stdout);
 }
