@@ -2,6 +2,7 @@
 #include <msg/unistd.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 #include "utils.h"
