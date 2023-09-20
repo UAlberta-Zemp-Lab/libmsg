@@ -1,17 +1,24 @@
-CFLAGS = -O2 -ggdb -Wall -Werror
-INCS = -I ../include
+.POSIX:
 
-MSGOBJ = ../src/msg/msg.o
+include ../config.mk
+
+CFLAGS_ALL = $(CFLAGS) -ggdb
+
+INCS = -I ../include
+LIBS = -L ../src -lmsg
 
 all: tests
 
 .c.o:
-	$(CC) $(CFLAGS) $(INCS) -o $@ -c $<
+	$(CC) $(CFLAGS_ALL) $(INCS) -o $@ -c $<
 
 tests: unistd
 
-unistd: $(MSGOBJ) utils.o unistd-test.o ../src/unistd/unistd.o
-	$(CC) $(CFLAGS) $(INCS) $(MSGOBJ) utils.o unistd-test.o ../src/unistd/unistd.o -o $@
+unistd: utils.o unistd-test.o
+	$(CC) $(CFLAGS_ALL) $(INCS) utils.o unistd-test.o $(LIBS) -o $@
+	./$@
 
 clean:
-	rm *.o $(MSGOBJ) ../src/unistd/unistd.o
+	rm -f *.o unistd
+
+.PHONY: all clean tests
