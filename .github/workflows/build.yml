@@ -1,0 +1,22 @@
+name: build
+
+on: [push, pull_request]
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        cc:
+          - "gcc"
+          - "clang"
+    env:
+      CC: "${{ matrix.cc }}"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Library
+        run: |
+          make
+      - name: Build and run tests
+        run: |
+          make test
