@@ -2,25 +2,32 @@
 
 include config.mk
 
-all: lib
+OBJ =\
+	src/msg/msg.o \
+	src/unistd/unistd.o \
 
-lib:
-	$(MAKE) -C src
+.c.o:
+	$(CC) $(CFLAGS) -I include -c $< -o $@
 
-test: lib
+all: $(ANAME)
+
+$(ANAME): $(OBJ)
+	$(AR) crs $@ $^
+
+test: $(ANAME)
 	$(MAKE) -C test
 
 install:
-	mkdir -p $(INCDIR)
-	install -m 0644 include/msg/*.h $(DESTDIR)$(INCDIR)/
-	$(MAKE) -C src install
+	mkdir -p $(INCPREFIX)
+	install -m 0644 libmsg.a $(DESTDIR)$(LIBPREFIX)
+	install -m 0644 include/msg/*.h $(DESTDIR)$(INCPREFIX)
 
 uninstall:
 	rm -rf $(DESTDIR)$(INCDIR)
 	$(MAKE) -C src uninstall
 
 clean:
-	$(MAKE) -C src clean
+	rm -f $(ANAME) $(OBJ)
 	$(MAKE) -C test clean
 
 .PHONY: all clean install uninstall lib test

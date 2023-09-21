@@ -5,7 +5,7 @@ include ../config.mk
 CFLAGS_ALL = $(CFLAGS) -ggdb
 
 INCS = -I ../include
-LIBS = -L ../src -lmsg
+LIBS = -L ../ -lmsg
 
 all: tests
 
@@ -15,7 +15,7 @@ all: tests
 tests: unistd
 
 unistd: utils.o unistd-test.o
-	$(CC) $(CFLAGS_ALL) $(INCS) utils.o unistd-test.o $(LIBS) -o $@
+	$(CC) utils.o unistd-test.o ../$(ANAME) $(LIBS) -o $@
 	./$@
 
 clean:
