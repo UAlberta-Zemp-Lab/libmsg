@@ -1,0 +1,14 @@
+{
+	"name": "libmsg",
+	"version": "0.0.0",
+	"description": "A communication library with variable length messages and a variety of backends",
+	"keywords": [
+		"communication"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/UAlberta-Zemp-Lab/libmsg.git"
+	},
+	"frameworks": "*",
+	"platforms": "*"
+}
