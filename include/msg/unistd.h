@@ -6,8 +6,16 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Prototypes */
 bool msg_read(int[2], Msg *);
 bool msg_write(int[2], Msg *);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _MSG_UNISTD_H */

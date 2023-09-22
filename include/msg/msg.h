@@ -22,8 +22,16 @@ typedef struct {
 	void *data;
 } Msg;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Prototypes */
 bool msg_alloc(Msg *);
 void msg_free(Msg *);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _MSG_H */
