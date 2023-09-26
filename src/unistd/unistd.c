@@ -105,7 +105,7 @@ send_response(int fd, uint16_t mt)
  * returns whether the operation succeeded
  */
 bool
-msg_stream_read_msg(int pipefd[2], Msg *m)
+msg_read(int pipefd[2], Msg *m)
 {
 	for (;;) {
 		/* try a read and retry if it fails */
@@ -136,7 +136,7 @@ msg_stream_read_msg(int pipefd[2], Msg *m)
  * returns whether it succeeded
  */
 bool
-msg_stream_write_msg(int pipefd[2], Msg *m)
+msg_write(int pipefd[2], Msg *m)
 {
 	for (;;) {
 		if (!write_hdr(pipefd[1], m))

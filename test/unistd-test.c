@@ -23,12 +23,12 @@ msg_pipe(Msg *txm, Msg *rxm)
 	} else if (pid == 0) { /* child process */
 		/* could close() some fds but the child will exit anyways */
 		int prcw[2] = { parent[0], child[1] };
-		if (!msg_stream_write_msg(prcw, txm))
+		if (!msg_write(prcw, txm))
 			die("child failed to write msg");
 		exit(0);
 	} else { /* parent process */
 		int pwcr[2] = { child[0], parent[1] };
-		if (!msg_stream_read_msg(pwcr, rxm))
+		if (!msg_read(pwcr, rxm))
 			die("parent failed to read msg");
 	}
 

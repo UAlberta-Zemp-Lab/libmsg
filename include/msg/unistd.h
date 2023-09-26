@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 /* Prototypes */
-bool msg_stream_read_msg(int[2], Msg *);
-bool msg_stream_write_msg(int[2], Msg *);
+bool msg_read(int[2], Msg *);
+bool msg_write(int[2], Msg *);
 
 #endif /* _MSG_UNISTD_H */
