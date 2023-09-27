@@ -6,13 +6,11 @@
 #include <stdint.h>
 
 /* Reserved Message Types */
-#define MSG_ERR      0xF000
-#define MSG_ACK      0xF001
-#define MSG_REJECT   0xF002
-#define MSG_CONTINUE 0xF003
-#define MSG_RETRY    0xF004
-#define MSG_SUCCESS  0xF005
-#define MSG_FAILURE  0xF006
+#define MSG_ERR      0xFF00
+#define MSG_ACK      0xFF01
+#define MSG_REJECT   0xFF02
+#define MSG_CONTINUE 0xFF03
+#define MSG_RETRY    0xFF04
 #define MSG_DEBUG    0xFFFF
 
 /* Type Definitions */
