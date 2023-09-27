@@ -1,4 +1,5 @@
 /* See LICENSE file for copyright and license details. */
+#include <errno.h>
 #include <msg/msg.h>
 #include <msg/unistd.h>
 #include <stdbool.h>
@@ -120,6 +121,10 @@ msg_read(int pipefd[2], Msg *m)
 				return false;
 
 			if (!read_data(pipefd[0], m)) {
+				if (errno == ENOMEM) {
+					send_response(pipefd[1], MSG_ERR);
+					return false;
+				}
 				if (!send_response(pipefd[1], MSG_RETRY))
 					return false;
 				continue;
