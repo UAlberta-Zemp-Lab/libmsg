@@ -14,9 +14,23 @@ jobs:
       CC: "${{ matrix.cc }}"
     steps:
       - uses: actions/checkout@v4
-      - name: Build Library
+      - name: Install dependencies
         run: |
-          make
-      - name: Build and run tests
+          sudo apt-get update
+          sudo apt-get install python3-pip ninja-build
+          sudo python3 -m pip install meson
+
+      - name: Build library
         run: |
-          make test
+          meson setup build
+          meson compile -C build
+
+      - name: Run tests
+        id: tests
+        run: |
+          meson test -C build
+
+      - name: Print test log
+        if: ${{ failure() && steps.tests.outcome == 'failure' }}
+        run: |
+          cat ./build/meson-logs/testlog.txt

@@ -41,6 +41,9 @@ msg_pipe(Msg *txm, Msg *rxm)
 int
 main(void)
 {
+	/* hack around meson's broken buffering */
+	setvbuf(stdout, NULL, _IONBF, 0);
+
 	uint8_t data[4] = { 0xde, 0xad, 0xbe, 0xef };
 	Msg m1 = { .type = 0x1234, .length = 4, .data = data }, m2;
 
