@@ -8,4 +8,8 @@ if posix
 	                     include_directories: incdir,
 	                     link_with: [utils, libmsg])
 	test('unistd', unistd)
+	arduino = executable('arduino-test', 'arduino/host.c',
+	                     include_directories: incdir,
+	                     link_with: [utils, libmsg])
+	test('arduino', arduino)
 endif
