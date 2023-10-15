@@ -11,7 +11,7 @@ project('libmsg',
 	]
 )
 
-incdir = include_directories('include', 'include/msg')
+subdir('include')
 
 # determine the platform being built for
 win32 = host_machine.system() == 'cygwin' or host_machine.system() == 'windows'
