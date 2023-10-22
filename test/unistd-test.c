@@ -10,11 +10,11 @@
 void
 msg_pipe(Msg *txm, Msg *rxm)
 {
-	int parent[2], child[2];
+	int p1[2], p2[2];
 
-	if (pipe(parent) == -1)
+	if (pipe(p1) == -1)
 		die("pipe(parent): failed");
-	if (pipe(child) == -1)
+	if (pipe(p2) == -1)
 		die("pipe(child): failed");
 
 	pid_t pid = fork();
@@ -22,20 +22,20 @@ msg_pipe(Msg *txm, Msg *rxm)
 		die("fork(): failed");
 	} else if (pid == 0) { /* child process */
 		/* could close() some fds but the child will exit anyways */
-		int prcw[2] = { parent[0], child[1] };
-		if (!msg_write(prcw, txm))
+		int child[2] = { p1[0], p2[1] };
+		if (!msg_write(child, txm))
 			die("child failed to write msg");
 		exit(0);
 	} else { /* parent process */
-		int pwcr[2] = { child[0], parent[1] };
-		if (!msg_read(pwcr, rxm))
+		int parent[2] = { p2[0], p1[1] };
+		if (!msg_read(parent, rxm))
 			die("parent failed to read msg");
 	}
 
-	close(parent[0]);
-	close(parent[1]);
-	close(child[0]);
-	close(child[1]);
+	close(p1[0]);
+	close(p1[1]);
+	close(p2[0]);
+	close(p2[1]);
 }
 
 int
