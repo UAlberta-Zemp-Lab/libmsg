@@ -6,12 +6,13 @@
 #include <stdint.h>
 
 /* Reserved Message Types */
-#define MSG_ERR      0xFF00
-#define MSG_ACK      0xFF01
-#define MSG_REJECT   0xFF02
-#define MSG_CONTINUE 0xFF03
-#define MSG_RETRY    0xFF04
-#define MSG_DEBUG    0xFFFF
+#define MSG_UNDEF	 	0x0000
+#define MSG_ERR      	0xFF00
+#define MSG_ACK      	0xFF01
+#define MSG_REJECT   	0xFF02
+#define MSG_CONTINUE 	0xFF03
+#define MSG_RETRY    	0xFF04
+#define MSG_DEBUG    	0xFFFF
 
 /* Type Definitions */
 typedef struct {
@@ -20,16 +21,8 @@ typedef struct {
 	void *data;
 } Msg;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Prototypes */
 bool msg_alloc(Msg *);
 void msg_free(Msg *);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* _MSG_H */
