@@ -1,0 +1,6 @@
+{
+    "debugBuildDir": "${workspaceFolder}/build/debug",
+    "releaseBuildDir": "${workspaceFolder}/build/release",
+    "C_Cpp.autoAddFileAssociations": false,
+    "editor.formatOnSave": true
+}
