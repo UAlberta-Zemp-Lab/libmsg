@@ -1,0 +1,122 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "Meson: Configure (Debug)",
+            "command": "meson",
+            "args": [
+                "setup",
+                "${config:debugBuildDir}",
+                "--buildtype",
+                "debug",
+                "--wrap-mode",
+                "forcefallback",
+                "--reconfigure"
+            ],
+            "problemMatcher": [
+                {
+                    "base": "$meson-gcc",
+                    "fileLocation": [
+                        "relative",
+                        "${workspaceRoot}/build/debug"
+                    ]
+                }
+            ],
+            "icon": {
+                "id": "gear",
+                "color": "terminal.ansiYellow"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Meson: Build (Debug)",
+            "group": "build",
+            "command": "meson",
+            "args": [
+                "compile",
+                "-C",
+                "${config:debugBuildDir}"
+            ],
+            "problemMatcher": [
+                {
+                    "base": "$meson-gcc",
+                    "fileLocation": [
+                        "relative",
+                        "${workspaceRoot}/build/debug"
+                    ]
+                }
+            ],
+            "icon": {
+                "id": "briefcase",
+                "color": "terminal.ansiYellow"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Meson: Clean (Debug)",
+            "group": "build",
+            "command": "meson",
+            "args": [
+                "compile",
+                "-C",
+                "${config:debugBuildDir}",
+                "--clean"
+            ],
+            "problemMatcher": [
+                {
+                    "base": "$meson-gcc",
+                    "fileLocation": [
+                        "relative",
+                        "${workspaceRoot}/build/debug"
+                    ]
+                }
+            ],
+            "icon": {
+                "id": "trash",
+                "color": "terminal.ansiYellow"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Meson: Install (Debug)",
+            "command": "meson",
+            "args": [
+                "install",
+                "-C",
+                "./build/debug",
+                "--destdir",
+                "./",
+                "--quiet"
+            ],
+            "icon": {
+                "id": "insert",
+                "color": "terminal.ansiYellow"
+            },
+            "problemMatcher": [
+                {
+                    "base": "$meson-gcc",
+                    "fileLocation": [
+                        "relative",
+                        "${workspaceRoot}/build/debug"
+                    ]
+                }
+            ],
+        },
+        {
+            "type": "shell",
+            "label": "Meson: Test",
+            "group": "test",
+            "command": "meson ",
+            "args": [
+                "test",
+                "-C",
+                "${config:debugBuildDir}"
+            ],
+            "icon": {
+                "id": "beaker",
+                "color": "terminal.ansiYellow"
+            }
+        }
+    ]
+}
