@@ -4,6 +4,7 @@ project('libmsg',
 	version: files('./VERSION'),
 	default_options: [
 		'c_std=c99',
+		'cpp_std=c++20',
 		'debug=false',
 		'default_library=both',
 		'optimization=s',
@@ -23,6 +24,15 @@ c_sources = files(
 	'src/unistd/unistd.c',
 )
 
-libmsg = library('msg', c_sources, install: true, include_directories: incdir)
+cpp_sources = files(
+	'src/msg/msg.cpp',
+)
+
+
+libmsg_c = library('msg_c', c_sources, install: true, include_directories: incdir)
+libmsg_cpp = library('msg_cpp', cpp_sources, install: true, include_directories: incdir)
+
+libmsg_c_dep = declare_dependency(include_directories : incdir, link_with : libmsg_c)
+libmsg_cpp_dep = declare_dependency(include_directories : incdir, link_with : libmsg_cpp)
 
 subdir('test')
