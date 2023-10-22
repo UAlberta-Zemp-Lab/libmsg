@@ -106,32 +106,32 @@ send_response(int fd, uint16_t mt)
  * returns whether the operation succeeded
  */
 bool
-msg_read(int pipefd[2], Msg *m)
+msg_read(int endPoints[2], Msg *m)
 {
 	for (;;) {
 		/* try a read and retry if it fails */
-		if (!read_hdr(pipefd[0], m)) {
-			if (!send_response(pipefd[1], MSG_RETRY))
+		if (!read_hdr(endPoints[0], m)) {
+			if (!send_response(endPoints[1], MSG_RETRY))
 				return false;
 			continue;
 		}
 
 		if (m->length > 0) {
-			if (!send_response(pipefd[1], MSG_CONTINUE))
+			if (!send_response(endPoints[1], MSG_CONTINUE))
 				return false;
 
-			if (!read_data(pipefd[0], m)) {
+			if (!read_data(endPoints[0], m)) {
 				if (errno == ENOMEM) {
-					send_response(pipefd[1], MSG_ERR);
+					send_response(endPoints[1], MSG_ERR);
 					return false;
 				}
-				if (!send_response(pipefd[1], MSG_RETRY))
+				if (!send_response(endPoints[1], MSG_RETRY))
 					return false;
 				continue;
 			}
 		}
 
-		return send_response(pipefd[1], MSG_ACK);
+		return send_response(endPoints[1], MSG_ACK);
 	}
 }
 
@@ -141,13 +141,13 @@ msg_read(int pipefd[2], Msg *m)
  * returns whether it succeeded
  */
 bool
-msg_write(int pipefd[2], Msg *m)
+msg_write(int endPoints[2], Msg *m)
 {
 	for (;;) {
-		if (!write_hdr(pipefd[1], m))
+		if (!write_hdr(endPoints[1], m))
 			return false;
 
-		switch (check_response(pipefd[0])) {
+		switch (check_response(endPoints[0])) {
 		case MSG_RETRY:
 			continue;
 		case MSG_CONTINUE:
@@ -160,10 +160,10 @@ msg_write(int pipefd[2], Msg *m)
 			return false;
 		}
 
-		if (!write_data(pipefd[1], m))
+		if (!write_data(endPoints[1], m))
 			return false;
 
-		switch (check_response(pipefd[0])) {
+		switch (check_response(endPoints[0])) {
 		case MSG_RETRY:
 			continue;
 		case MSG_ACK:
