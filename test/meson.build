@@ -16,6 +16,8 @@ cppSourcesLibObj = libmsg_cpp.extract_objects(cpp_sources)
 
 cpp_testSources = files(
 	'MsgTest.cpp',
+	'MsgHandlerTest.cpp',
+	'util/DualPort.cpp'
 )
 
 MsgTest = executable('MsgTest', cpp_testSources, objects: cppSourcesLibObj, include_directories: incdir, dependencies: [catch2], install : true)
