@@ -26,6 +26,7 @@ c_sources = files(
 
 cpp_sources = files(
 	'src/msg/msg.cpp',
+	'src/msg/MsgHandler.cpp',
 )
 
 
