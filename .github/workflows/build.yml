@@ -34,3 +34,37 @@ jobs:
         if: ${{ failure() && steps.tests.outcome == 'failure' }}
         run: |
           cat ./build/meson-logs/testlog.txt
+  windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        sys:
+          - "mingw64"
+          - "ucrt64"
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: "${{ matrix.sys }}"
+          update: true
+          install: git
+          pacboy: >-
+            meson:p
+
+      - name: Build library
+        run: |
+          meson setup build
+          meson compile -C build
+
+      - name: Run tests
+        id: tests
+        run: |
+          meson test -C build
+
+      - name: Print test log
+        if: ${{ failure() && steps.tests.outcome == 'failure' }}
+        run: |
+          cat ./build/meson-logs/testlog.txt
