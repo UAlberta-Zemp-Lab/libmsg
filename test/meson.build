@@ -24,7 +24,9 @@ libmsg_cpp_test = library('msg_cpp_test', cpp_testSources, install: true, includ
 libmsg_cpp_test_dep = declare_dependency(include_directories : incdirTest, link_with : libmsg_cpp_test)
 
 cpp_testSources += files(
+	'msglib_cpp_tests.cpp',
 	'MsgTest.cpp',
+	'MsgHandlerTest.cpp',
 )
 
 MsgTest = executable('MsgTest', cpp_testSources, include_directories: [incdir, incdirTest], link_with: [msg_cpp])

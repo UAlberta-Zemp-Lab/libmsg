@@ -28,6 +28,7 @@ c_sources = files(
 
 cpp_sources = files(
 	'src/msg/Msg.cpp',
+	'src/msg/MsgHandler.cpp',
 )
 
 if posix
