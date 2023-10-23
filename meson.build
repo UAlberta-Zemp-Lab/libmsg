@@ -21,8 +21,14 @@ posix = not win32
 c_sources = files(
 	'src/msg/msg.c',
 	# Backends
-	'src/unistd/unistd.c',
 )
+
+if posix
+	c_sources += files(
+		# Backends
+		'src/unistd/unistd.c',
+	)
+endif
 
 libmsg = library('msg', c_sources, install: true, include_directories: incdir)
 
