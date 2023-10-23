@@ -7,7 +7,8 @@ project('libmsg',
 		'debug=false',
 		'default_library=both',
 		'optimization=s',
-		'warning_level=1',
+		'warning_level=3',
+		'werror=true',
 	]
 )
 
