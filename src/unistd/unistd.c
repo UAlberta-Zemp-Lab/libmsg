@@ -14,8 +14,8 @@
 static bool
 read_bytes(int fd, void *b, size_t n)
 {
-	ssize_t r;
-	while ((r = read(fd, b, n)) == -1 && errno == EINTR)
+	size_t r;
+	while ((r = (size_t)read(fd, b, n)) == (size_t)-1 && errno == EINTR)
 		;
 	return r == n;
 }
@@ -54,8 +54,8 @@ read_data(int fd, Msg *m)
 static bool
 write_bytes(int fd, const void *b, size_t n)
 {
-	ssize_t r;
-	while ((r = write(fd, b, n)) == -1 && errno == EINTR)
+	size_t r;
+	while ((r = (size_t)write(fd, b, n)) == (size_t)-1 && errno == EINTR)
 		;
 	return r == n;
 }
