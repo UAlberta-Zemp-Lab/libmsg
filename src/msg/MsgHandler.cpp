@@ -1,5 +1,6 @@
 /* See LICENSE file for copyright and license details. */
 #include "msg/MsgHandler.hpp"
+#include <mutex>
 #include <stdbool.h>
 #include <stdexcept>
 #include <stdint.h>
@@ -11,14 +12,7 @@
  * appropriate message on failure
  */
 msg::Msg
-msg::MsgHandler::readMsg() {
-
-	if (this->stream == NULL) {
-		throw std::runtime_error("No Stream Connected");
-	}
-
-	std::lock_guard<std::mutex> lock(*(this->mtx));
-	Stream<uint8_t> &stream = *(this->stream);
+msg::MsgHandler::readMsg(Stream<uint8_t> &stream) {
 
 	Msg readMsg;
 	while (true) {
@@ -56,19 +50,11 @@ msg::MsgHandler::readMsg() {
  * appropriate message on failure.
  */
 void
-msg::MsgHandler::writeMsg(const msg::Msg &writeMsg) {
-
-	if (this->stream == NULL) {
-		throw std::runtime_error("No Stream Connected");
-	}
-
-	std::lock_guard<std::mutex> lock(*(this->mtx));
-	Stream<uint8_t> &stream = *(this->stream);
-
+msg::MsgHandler::writeMsg(const msg::Msg &writeMsg, Stream<uint8_t> &stream) {
 	while (true) {
 		stream << writeMsg.header();
 
-		switch (this->checkResponse()) {
+		switch (MsgHandler::checkResponse(stream)) {
 		case MsgType::ACK:
 			return;
 		case MsgType::CONTINUE:
@@ -85,7 +71,7 @@ msg::MsgHandler::writeMsg(const msg::Msg &writeMsg) {
 		}
 
 		stream << writeMsg.data();
-		switch (this->checkResponse()) {
+		switch (MsgHandler::checkResponse(stream)) {
 		case MsgType::ACK:
 			return;
 		case MsgType::RETRY:
@@ -98,21 +84,10 @@ msg::MsgHandler::writeMsg(const msg::Msg &writeMsg) {
 	}
 }
 
-void
-msg::MsgHandler::attach(std::unique_ptr<Stream<uint8_t>> stream) {
-	std::lock_guard<std::mutex> lock(*(this->mtx));
-	this->stream = std::move(stream);
-};
-void
-msg::MsgHandler::detach() {
-	std::lock_guard<std::mutex> lock(*(this->mtx));
-	this->stream == NULL;
-}
-
 uint16_t
-msg::MsgHandler::checkResponse() {
+msg::MsgHandler::checkResponse(Stream<uint8_t> &stream) {
 	std::vector<uint8_t> response(4, 0);
-	*(this->stream) >> response;
+	stream >> response;
 	uint16_t type = (response[1] << 8) | response[0];
 	return type;
 }

@@ -9,18 +9,11 @@
 namespace msg {
 class MsgHandler {
 public:
-	MsgHandler(){};
-	MsgHandler(std::unique_ptr<Stream<uint8_t>> s) : stream(std::move(s)){};
-	Msg readMsg();
-	void writeMsg(const Msg &);
-	void attach(std::unique_ptr<Stream<uint8_t>> stream);
-	void detach();
+	static Msg readMsg(Stream<uint8_t> &);
+	static void writeMsg(const Msg &, Stream<uint8_t> &);
 
 protected:
-	std::unique_ptr<Stream<uint8_t>> stream;
-	mutable std::unique_ptr<std::mutex> mtx =
-	    std::make_unique<std::mutex>();
-	uint16_t checkResponse();
+	static uint16_t checkResponse(Stream<uint8_t> &);
 };
 } // namespace msg
 
