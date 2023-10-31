@@ -34,6 +34,8 @@ endif
 cpp_sources = files(
 	'src/msg/msg.cpp',
 	'src/msg/MsgHandler.cpp',
+	'src/msg/communicator/SerialCommunicator.cpp',
+	'src/msg/communicator/WorkerThread.cpp'
 )
 
 libmsg = library('msg', c_sources, install: true, include_directories: incdir)

@@ -17,6 +17,7 @@ cppSourcesLibObj = libmsg_cpp.extract_objects(cpp_sources)
 cpp_testSources = files(
 	'MsgTest.cpp',
 	'MsgHandlerTest.cpp',
+	'SerialCommunicatorTest.cpp',
 	'util/DualPort.cpp'
 )
 
