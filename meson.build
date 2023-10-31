@@ -27,6 +27,8 @@ c_sources = files(
 cpp_sources = files(
 	'src/msg/msg.cpp',
 	'src/msg/MsgHandler.cpp',
+	'src/msg/communicator/SerialCommunicator.cpp',
+	'src/msg/communicator/WorkerThread.cpp'
 )
 
 
