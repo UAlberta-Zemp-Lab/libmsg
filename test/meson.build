@@ -20,6 +20,12 @@ libmsg_cpp_test = library('msg_cpp', install: true, include_directories: [incdir
 
 libmsg_cpp_test_dep = declare_dependency(include_directories : incdirTest, link_with : libmsg_cpp_test)
 
+testHeaders = files(
+	'include/msg/test/BaseMsgTests.hpp',
+	'include/msg/test/DualPort.hpp'
+)
+install_headers(testHeaders, subdir: 'msg/test')
+
 cpp_testSources = files(
 	'MsgTest.cpp',
 	'MsgHandlerTest.cpp',
