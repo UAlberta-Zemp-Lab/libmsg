@@ -1,15 +1,15 @@
-#include "MsgBaseTests.cpp"
-#include "util/DualPort.cpp"
+#include "msg/test/BaseMsgTests.hpp"
+#include "msg/test/DualPort.hpp"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators_all.hpp>
 
 TEST_CASE("Message Communciation", "[SerialCommunicator]") {
 	msg::DualPort<uint8_t> dualPort;
 	std::unique_ptr<msg::Serial<uint8_t>> portA =
-	    std::make_unique<msg::DualPort<uint8_t>::Port<uint8_t>>(
+	    std::make_unique<msg::DualPort<uint8_t>::Port>(
 		std::move(dualPort.GetPortA()));
 	std::unique_ptr<msg::Serial<uint8_t>> portB =
-	    std::make_unique<msg::DualPort<uint8_t>::Port<uint8_t>>(
+	    std::make_unique<msg::DualPort<uint8_t>::Port>(
 		std::move(dualPort.GetPortB()));
 	const msg::Msg message =
 	    GENERATE(msg::Msg(), msg::Msg(msg::MsgType::DEBUG),

@@ -14,13 +14,18 @@ endif
 
 cppSourcesLibObj = libmsg_cpp.extract_objects(cpp_sources)
 
+incdirTest = include_directories('include')
+
+libmsg_cpp_test = library('msg_cpp', install: true, include_directories: [incdirTest], dependencies: [catch2, libmsg_cpp_dep])
+
+libmsg_cpp_test_dep = declare_dependency(include_directories : incdirTest, link_with : libmsg_cpp_test)
+
 cpp_testSources = files(
 	'MsgTest.cpp',
 	'MsgHandlerTest.cpp',
-	'SerialCommunicatorTest.cpp',
-	'util/DualPort.cpp'
+	'SerialCommunicatorTest.cpp'
 )
 
-MsgTest = executable('MsgTest', cpp_testSources, objects: cppSourcesLibObj, include_directories: incdir, dependencies: [catch2], install : true)
+MsgTest = executable('MsgTest', [cpp_testSources], objects: cppSourcesLibObj, include_directories: [incdir, incdirTest], dependencies: [catch2], install : true)
 
 test('MsgTest', MsgTest)

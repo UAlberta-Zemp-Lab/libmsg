@@ -1,5 +1,5 @@
-#include "MsgBaseTests.cpp"
-#include "util/DualPort.cpp"
+#include "msg/test/BaseMsgTests.hpp"
+#include "msg/test/DualPort.hpp"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators_all.hpp>
 
