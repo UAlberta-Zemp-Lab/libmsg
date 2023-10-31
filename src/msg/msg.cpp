@@ -130,7 +130,7 @@ Msg::operator byteArray() const {
 } // namespace msg
 
 bool
-msg::Msg::operator==(Msg &other) const {
+msg::Msg::operator==(const Msg &other) const {
 	return (this == &other)
 	       || (this->_header == other._header)
 	              && (this->_data == other._data);

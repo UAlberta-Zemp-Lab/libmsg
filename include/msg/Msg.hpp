@@ -61,7 +61,7 @@ public:
 	virtual bool checkInvariants();
 
 	virtual operator byteArray() const;
-	virtual bool operator==(Msg &other) const;
+	virtual bool operator==(const Msg &other) const;
 
 private:
 	byteArray _header = byteArray(4, 0);
