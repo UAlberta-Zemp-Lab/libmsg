@@ -132,6 +132,6 @@ Msg::operator byteArray() const {
 bool
 msg::Msg::operator==(const Msg &other) const {
 	return (this == &other)
-	       || (this->_header == other._header)
-	              && (this->_data == other._data);
+	       || ((this->_header == other._header)
+	           && (this->_data == other._data));
 }
