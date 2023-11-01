@@ -2,6 +2,7 @@
 #include "msg/Msg.hpp"
 #include <iterator>
 #include <memory>
+#include <sstream>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -116,11 +117,23 @@ Msg::operator byteArray() const {
 	output.insert(output.end(), _data.begin(), _data.end());
 	return output;
 }
-} // namespace msg
 
 bool
-msg::Msg::operator==(const Msg &other) const {
+Msg::operator==(const Msg &other) const {
 	return (this == &other)
 	       || ((this->_header == other._header)
 	           && (this->_data == other._data));
 }
+
+Msg::operator std::string() const {
+	std::stringstream ss;
+	ss << std::format("{0:#06x} {1:#06x}", type(), length());
+	if (length() > 0) {
+		ss << "\n";
+	}
+	for (auto byte : _data) {
+		ss << std::format("{0:04x} ", byte);
+	}
+	return ss.str();
+}
+} // namespace msg
