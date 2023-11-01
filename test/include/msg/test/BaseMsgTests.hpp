@@ -14,8 +14,11 @@ checkMsgHandling(const Msg &message, Stream<uint8_t> &portA,
 
 	std::future<void> write = std::async(
 	    msg::MsgHandler::writeMsg, std::ref(message), std::ref(portA));
-	std::future<msg::Msg> read =
-	    std::async(msg::MsgHandler::readMsg, std::ref(portB));
+	std::future<msg::Msg> read = std::async(
+	    [](Stream<uint8_t> &stream) {
+		    return msg::MsgHandler::readMsg(stream);
+	    },
+	    std::ref(portB));
 	write.wait();
 	read.wait();
 	receivedMsg = read.get();

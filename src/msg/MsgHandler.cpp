@@ -12,14 +12,15 @@
  * appropriate message on failure
  */
 msg::Msg
-msg::MsgHandler::readMsg(Stream<uint8_t> &stream) {
+msg::MsgHandler::readMsg(Stream<uint8_t> &stream,
+                         const MsgValidator &validator) {
 
 	Msg readMsg;
 	while (true) {
 		try {
 			readMsg = Msg(stream.read(Msg::sizeOfHeader));
-		} catch (std::bad_cast &x) { // TODO: change to a custom type
-			                     // for rejected Msgs
+			validator.validate(readMsg);
+		} catch (msg::MsgException &x) {
 			stream << Msg(MsgType::REJECT);
 			throw x;
 		} catch (std::exception &x) {
@@ -31,8 +32,9 @@ msg::MsgHandler::readMsg(Stream<uint8_t> &stream) {
 			try {
 				stream << Msg(MsgType::CONTINUE);
 				readMsg.setData(stream.read(readMsg.length()));
-			} catch (std::bad_alloc &x) {
-				stream << Msg(MsgType::ERR);
+				validator.validate(readMsg);
+			} catch (msg::MsgException &x) {
+				stream << Msg(MsgType::REJECT);
 				throw x;
 			} catch (std::exception &x) {
 				stream << Msg(MsgType::RETRY);
@@ -76,6 +78,8 @@ msg::MsgHandler::writeMsg(const msg::Msg &writeMsg, Stream<uint8_t> &stream) {
 			return;
 		case MsgType::RETRY:
 			continue;
+		case MsgType::REJECT:
+			throw std::runtime_error("Message Rejected");
 		case MsgType::ERR:
 			throw std::runtime_error("Message Error");
 		default:
