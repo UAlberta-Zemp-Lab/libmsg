@@ -8,18 +8,6 @@
 #include <vector>
 
 namespace msg {
-MsgType::operator uint16_t() const { return this->type; }
-
-std::map<uint16_t, std::string>
-MsgType::GetKnownMsgTypes() {
-	return std::map<uint16_t, std::string>(); // TODO
-}
-
-bool
-MsgType::IsKnownMsgType(uint16_t type) {
-	return false;
-}
-
 // Msg
 Msg::Msg(byteConstIter begin, byteConstIter end) {
 	this->setHeader(begin, end);
