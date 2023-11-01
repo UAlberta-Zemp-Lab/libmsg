@@ -41,6 +41,8 @@ public:
 	std::map<timeStamp, Msg> receiveLog;
 	std::chrono::milliseconds listeningInterval =
 	    std::chrono::milliseconds(10);
+	std::unique_ptr<MsgValidator> validator =
+	    std::make_unique<MsgValidator>();
 
 protected:
 	std::unique_ptr<Serial<uint8_t>> serial;
@@ -52,6 +54,7 @@ protected:
 	std::atomic<bool> listening{ false };
 	std::condition_variable listeningCondition;
 
+	void processRequest(Request);
 	void listen();
 	void start();
 	void stop();

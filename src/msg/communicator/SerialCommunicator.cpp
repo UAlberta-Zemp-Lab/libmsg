@@ -7,7 +7,9 @@
 namespace msg {
 SerialCommunicator::SerialCommunicator(std::unique_ptr<Serial<uint8_t>> s)
     : serial(std::move(s)),
-      worker(std::make_unique<WorkerThread>(*serial, serialMtx)) {
+      worker(std::make_unique<WorkerThread>(
+	  *serial, serialMtx,
+	  std::bind(&processRequest, this, std::placeholders::_1))) {
 	start();
 };
 
@@ -25,8 +27,9 @@ void
 SerialCommunicator::setDevice(std::unique_ptr<Serial<uint8_t>> s) {
 	stop();
 	serial = std::move(s);
-	worker =
-	    std::make_unique<WorkerThread>(std::move(*worker), *s, serialMtx);
+	worker = std::make_unique<WorkerThread>(
+	    std::move(*worker), *s, serialMtx,
+	    std::bind(&processRequest, this, std::placeholders::_1));
 	start();
 }
 
@@ -116,5 +119,36 @@ msg::SerialCommunicator::stop() {
 		}
 		listeningCondition.notify_all();
 		listeningThread.join();
+	}
+}
+
+void
+msg::SerialCommunicator::processRequest(Request request) {
+	if (request.transmitMsg) {
+		try {
+			if (serial->isDataAvailable())
+				serial->flushRead();
+
+			MsgHandler::writeMsg(request.transmitMsg.value(),
+			                     *serial);
+
+			if (request.transmitPromise) {
+				request.transmitPromise.value().set_value();
+			}
+		} catch (const std::exception &w) {
+			request.transmitPromise.value().set_exception(
+			    std::current_exception());
+		}
+	}
+
+	if (request.receivePromise) {
+		try {
+			serial->flushWrite();
+			request.receivePromise.value().set_value(
+			    MsgHandler::readMsg(*serial, *validator));
+		} catch (const std::exception &e) {
+			request.receivePromise.value().set_exception(
+			    std::current_exception());
+		}
 	}
 }
