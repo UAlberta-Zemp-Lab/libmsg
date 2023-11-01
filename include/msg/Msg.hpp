@@ -81,6 +81,7 @@ public:
 
 	virtual operator byteArray() const;
 	virtual bool operator==(const Msg &other) const;
+	virtual explicit operator std::string() const;
 
 private:
 	byteArray _header = byteArray(Msg::sizeOfHeader, 0);
