@@ -2,6 +2,7 @@
 #ifndef _MSG_H
 #define _MSG_H
 
+#include "msg/types.hpp"
 #include <map>
 #include <memory>
 #include <stdint.h>
@@ -10,8 +11,7 @@
 
 /* Type Definitions */
 namespace msg {
-typedef std::vector<uint8_t> byteArray;
-typedef byteArray::const_iterator byteConstIter;
+
 /* Reserved Message Types */
 class MsgType {
 public:
