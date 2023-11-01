@@ -13,8 +13,7 @@
 namespace msg {
 
 /* Reserved Message Types */
-class MsgType {
-public:
+struct MsgType {
 	uint16_t type;
 
 	static inline constexpr uint16_t UNDEF = 0x0000;
@@ -28,9 +27,24 @@ public:
 	MsgType() : MsgType(MsgType::UNDEF){};
 	MsgType(uint16_t type) : type(type){};
 
-	operator uint16_t() const;
-	virtual std::map<uint16_t, std::string> GetKnownMsgTypes();
-	virtual bool IsKnownMsgType(uint16_t type);
+	operator uint16_t() const { return this->type; }
+	static const std::map<uint16_t, std::string> knownMsgTypes;
+	static bool isKnownMsgType(uint16_t type) {
+		return knownMsgTypes.find(type) != knownMsgTypes.end();
+	};
+};
+
+inline const std::map<uint16_t, std::string> MsgType::knownMsgTypes =
+    std::map<uint16_t, std::string>{
+	    {
+             { UNDEF, "UNDEF" },
+             { ERR, "ERR" },
+             { ACK, "ACK" },
+             { REJECT, "REJECT" },
+             { CONTINUE, "CONTINUE" },
+             { RETRY, "RETRY" },
+             { DEBUG, "DEBUG" },
+	     }
 };
 
 class Msg {
