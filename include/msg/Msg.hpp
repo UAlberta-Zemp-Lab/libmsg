@@ -83,9 +83,26 @@ public:
 	virtual bool operator==(const Msg &other) const;
 	virtual explicit operator std::string() const;
 
+	friend class MsgValidator;
+
 private:
 	byteArray _header = byteArray(Msg::sizeOfHeader, 0);
 	byteArray _data;
+};
+
+class MsgException : public std::logic_error {
+public:
+	Msg message;
+	MsgException(Msg m, std::string error)
+	    : std::logic_error(error), message(m) {}
+};
+
+struct MsgValidator {
+	virtual void validate(Msg msg) const {
+		if (!msg.checkInvariants()) {
+			throw new MsgException(msg, "Invariants failed");
+		}
+	}
 };
 } // namespace msg
 
