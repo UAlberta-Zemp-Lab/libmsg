@@ -84,7 +84,7 @@ SerialCommunicator::listen() {
 			return;
 		}
 
-		if (serial->numberOfBytesAvailable() >= 4) {
+		if (serial->numberOfBytesAvailable() >= Msg::sizeOfHeader) {
 			msg::Msg receiveMsg = msg::MsgHandler::readMsg(*serial);
 			receiveLog.insert(std::pair<timeStamp, Msg>(
 			    std::chrono::high_resolution_clock::now(),

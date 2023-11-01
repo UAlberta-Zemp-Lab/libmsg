@@ -23,8 +23,9 @@ MsgType::IsKnownMsgType(uint16_t type) {
 // Msg
 Msg::Msg(byteConstIter begin, byteConstIter end) {
 	this->setHeader(begin, end);
-	if (this->length() > 0 && std::distance(begin, end) > 4) {
-		this->setData(begin + 4, end);
+	if (this->length() > 0
+	    && std::distance(begin, end) > this->sizeOfHeader) {
+		this->setData(begin + this->sizeOfHeader, end);
 	}
 }
 Msg::Msg(uint16_t type, uint16_t length, const byteArray &data) {
@@ -55,7 +56,7 @@ Msg::length() const {
 
 unsigned int
 Msg::size() const {
-	return 4 + this->_data.size();
+	return this->sizeOfHeader + this->_data.size();
 }
 
 const byteArray &
@@ -70,10 +71,10 @@ Msg::data() const {
 
 void
 Msg::setHeader(const byteConstIter &begin, const byteConstIter &end) {
-	if (std::distance(begin, end) >= 4)
-		this->_header.assign(begin, begin + 4);
-	else if (std::distance(begin, end) >= 2) {
-		this->_header.assign(begin, begin + 2);
+	if (std::distance(begin, end) >= this->sizeOfHeader)
+		this->_header.assign(begin, begin + this->sizeOfHeader);
+	else if (std::distance(begin, end) >= this->sizeOfType) {
+		this->_header.assign(begin, begin + this->sizeOfType);
 		this->_header.push_back(0);
 		this->_header.push_back(0);
 	} else
