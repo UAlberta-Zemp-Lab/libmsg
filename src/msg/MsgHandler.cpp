@@ -17,7 +17,7 @@ msg::MsgHandler::readMsg(Stream<uint8_t> &stream) {
 	Msg readMsg;
 	while (true) {
 		try {
-			readMsg = Msg(stream.read(4));
+			readMsg = Msg(stream.read(Msg::sizeOfHeader));
 		} catch (std::bad_cast &x) { // TODO: change to a custom type
 			                     // for rejected Msgs
 			stream << Msg(MsgType::REJECT);
@@ -86,8 +86,5 @@ msg::MsgHandler::writeMsg(const msg::Msg &writeMsg, Stream<uint8_t> &stream) {
 
 uint16_t
 msg::MsgHandler::checkResponse(Stream<uint8_t> &stream) {
-	std::vector<uint8_t> response(4, 0);
-	stream >> response;
-	uint16_t type = (response[1] << 8) | response[0];
-	return type;
+	return Msg(stream.read(Msg::sizeOfHeader)).type();
 }

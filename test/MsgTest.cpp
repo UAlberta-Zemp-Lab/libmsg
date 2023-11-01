@@ -76,7 +76,7 @@ TEST_CASE("Msg Get Header", "[Msg]") {
 	msg::Msg msg = msg::Msg(type, length);
 
 	auto header = msg.header();
-	REQUIRE(header.size() == 4);
+	REQUIRE(header.size() == msg::Msg::sizeOfHeader);
 	uint16_t readType = (header[1] << 8) | (header[0]);
 	uint16_t readLength = (header[3] << 8) | (header[2]);
 	REQUIRE(msg.checkInvariants());

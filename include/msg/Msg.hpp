@@ -46,6 +46,11 @@ public:
 
 	virtual std::unique_ptr<Msg> clone() const;
 
+	static constexpr unsigned int sizeOfHeader = 4;
+	static constexpr unsigned int sizeOfType =
+	    sizeof(MsgType::type) / sizeof(uint8_t);
+	static constexpr unsigned int sizeOfLength = 2;
+
 	virtual uint16_t type() const;
 	virtual uint16_t length() const;
 	virtual unsigned int size() const;
@@ -64,7 +69,7 @@ public:
 	virtual bool operator==(const Msg &other) const;
 
 private:
-	byteArray _header = byteArray(4, 0);
+	byteArray _header = byteArray(Msg::sizeOfHeader, 0);
 	byteArray _data;
 };
 } // namespace msg
