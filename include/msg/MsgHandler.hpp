@@ -9,7 +9,8 @@
 namespace msg {
 class MsgHandler {
 public:
-	static Msg readMsg(Stream<uint8_t> &);
+	static Msg readMsg(Stream<uint8_t> &,
+	                   const MsgValidator & = MsgValidator());
 	static void writeMsg(const Msg &, Stream<uint8_t> &);
 
 protected:
