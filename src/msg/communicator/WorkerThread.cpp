@@ -76,37 +76,7 @@ WorkerThread::loop() {
 			request = this->requests.pop();
 		}
 
-		processRequest(std::move(request));
-	}
-}
-void
-WorkerThread::processRequest(Request request) {
-	serial.flushWrite();
-	if (request.transmitMsg) {
-		try {
-			if (serial.isDataAvailable())
-				serial.flushRead();
-
-			MsgHandler::writeMsg(request.transmitMsg.value(),
-			                     serial);
-
-			if (request.transmitPromise) {
-				request.transmitPromise.value().set_value();
-			}
-		} catch (const std::exception &w) {
-			request.transmitPromise.value().set_exception(
-			    std::current_exception());
-		}
-	}
-
-	if (request.receivePromise) {
-		try {
-			request.receivePromise.value().set_value(
-			    MsgHandler::readMsg(serial));
-		} catch (const std::exception &e) {
-			request.receivePromise.value().set_exception(
-			    std::current_exception());
-		}
+		processFunction(std::move(request));
 	}
 }
 } // namespace msg
