@@ -65,7 +65,6 @@ TEST_CASE("Msg Constructor", "[Msg]") {
 	REQUIRE(msg.checkInvariants());
 	REQUIRE(msg.type() == type);
 	REQUIRE(msg.length() == length);
-	REQUIRE(msg.data().size() == length);
 	REQUIRE(msg.data() == data);
 }
 
