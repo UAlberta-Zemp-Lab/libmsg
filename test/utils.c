@@ -37,7 +37,7 @@ assert_msg_equal_impl(const char *file, int line, Msg *m1, Msg *m2)
 	}
 
 	uint8_t *d1 = m1->data, *d2 = m2->data;
-	for (size_t i = 0; i < m1->length; i++) {
+	for (long unsigned int i = 0; i < m1->length; i++) {
 		if (d1[i] != d2[i]) {
 			printf("%s:%d: data[i = %zu]\n", file, line, i);
 			abort();
