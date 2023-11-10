@@ -41,8 +41,8 @@ jobs:
       fail-fast: false
       matrix:
         sys:
-          - "mingw64"
-          - "ucrt64"
+          - mingw64
+          - ucrt64
     defaults:
       run:
         shell: msys2 {0}
@@ -52,8 +52,10 @@ jobs:
         with:
           msystem: "${{ matrix.sys }}"
           update: true
-          install: git
+          install: >- 
+            git
           pacboy: >-
+            gcc:p
             meson:p
 
       - name: Build library
