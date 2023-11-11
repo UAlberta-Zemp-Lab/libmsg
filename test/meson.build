@@ -1,5 +1,3 @@
-incdir = include_directories('../include')
-
 utils = static_library('utils', 'utils.c', include_directories: incdir)
 
 link = executable('linker', 'link.c',
