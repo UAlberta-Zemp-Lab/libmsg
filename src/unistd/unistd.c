@@ -160,7 +160,6 @@ msg_write(int pipefd[2], Msg *m)
 			break;
 		case MSG_ACK:
 			return true;
-		case MSG_REJECT:
 		case MSG_ERR:
 		default:
 			return false;
