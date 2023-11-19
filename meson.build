@@ -20,6 +20,7 @@ posix = not win32
 
 c_sources = files(
 	'src/msg/msg.c',
+	'src/msg/msghandler.c',
 	# Backends
 )
 

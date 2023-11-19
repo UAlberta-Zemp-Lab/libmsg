@@ -22,14 +22,17 @@ msg_pipe(Msg *txm, Msg *rxm)
 		die("fork(): failed");
 	} else if (pid == 0) { /* child process */
 		/* could close() some fds but the child will exit anyways */
-		int prcw[2] = { parent[0], child[1] };
-		if (!msg_write(prcw, txm))
+		MsgUnistdDev d = { .rfd = parent[0], .wfd = child[1] };
+		MsgHandle *h = msg_unistd_alloc(&d);
+		if (!msg_write(h, txm))
 			die("child failed to write msg");
 		exit(0);
 	} else { /* parent process */
-		int pwcr[2] = { child[0], parent[1] };
-		if (!msg_read(pwcr, rxm))
+		MsgUnistdDev d = { .rfd = child[0], .wfd = parent[1] };
+		MsgHandle *h = msg_unistd_alloc(&d);
+		if (!msg_read(h, rxm))
 			die("parent failed to read msg");
+		free(h);
 	}
 
 	close(parent[0]);

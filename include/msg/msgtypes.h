@@ -1,3 +1,4 @@
+/* See LICENSE file for copyright and license details. */
 #ifndef _MSGTYPES_H
 #define _MSGTYPES_H
 

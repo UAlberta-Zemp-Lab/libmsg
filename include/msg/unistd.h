@@ -3,6 +3,7 @@
 #define _MSG_UNISTD_H
 
 #include <msg/msg.h>
+#include <msg/msghandler.h>
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -10,9 +11,12 @@
 extern "C" {
 #endif
 
+typedef struct {
+	int wfd, rfd;
+} MsgUnistdDev;
+
 /* Prototypes */
-bool msg_read(int[2], Msg *);
-bool msg_write(int[2], Msg *);
+MsgHandle *msg_unistd_alloc(MsgUnistdDev *d);
 
 #ifdef __cplusplus
 }
