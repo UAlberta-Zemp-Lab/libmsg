@@ -10,6 +10,7 @@
 #define MSG_ACK      0xFF01
 #define MSG_CONTINUE 0xFF02
 #define MSG_RETRY    0xFF03
+#define MSG_STOP     0xFF04
 #define MSG_DEBUG    0xFFFF
 
 /* Type Definitions */

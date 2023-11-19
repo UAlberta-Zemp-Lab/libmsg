@@ -122,6 +122,15 @@ msg_read(int pipefd[2], Msg *m)
 			continue;
 		}
 
+		switch(m->type) {
+		case MSG_STOP:
+			return true;
+		case MSG_ACK:
+		case MSG_CONTINUE:
+		case MSG_RETRY:
+			return send_response(pipefd[1], MSG_STOP);
+		}
+
 		if (m->length > 0) {
 			if (!send_response(pipefd[1], MSG_CONTINUE))
 				return false;
@@ -160,7 +169,6 @@ msg_write(int pipefd[2], Msg *m)
 			break;
 		case MSG_ACK:
 			return true;
-		case MSG_ERR:
 		default:
 			return false;
 		}
