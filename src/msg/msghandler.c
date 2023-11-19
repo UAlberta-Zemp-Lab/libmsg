@@ -8,18 +8,23 @@
 
 struct MsgHandle {
 	void *dev;
+	uint32_t timeout;
+	uint32_t (*get_time)(void);
 	bool (*read)(void *, void *, size_t);
 	bool (*write)(void *, void *, size_t);
 };
 
 MsgHandle *
-msg_handle_alloc(void *dev, bool (*write)(void *, void *, size_t),
+msg_handle_alloc(void *dev, uint32_t timeout, uint32_t (*get_time)(void),
+                 bool (*write)(void *, void *, size_t),
                  bool (*read)(void *, void *, size_t))
 {
 	MsgHandle *h = malloc(sizeof(MsgHandle));
+	h->dev = dev;
+	h->timeout = timeout;
+	h->get_time = get_time;
 	h->write = write;
 	h->read = read;
-	h->dev = dev;
 	return h;
 }
 
@@ -117,6 +122,13 @@ send_response(MsgHandle *h, uint16_t mt)
 	return write_hdr(h, &m);
 }
 
+static bool
+timeout(MsgHandle *h, uint32_t start_time)
+{
+	uint32_t tstamp = h->get_time();
+	return (tstamp < start_time) || (tstamp - start_time > h->timeout);
+}
+
 /*
  * attempts to read a message the handle h
  * returns whether the operation succeeded
@@ -124,7 +136,13 @@ send_response(MsgHandle *h, uint16_t mt)
 bool
 msg_read(MsgHandle *h, Msg *m)
 {
+	uint32_t start_time = h->get_time();
 	for (;;) {
+		if (timeout(h, start_time)) {
+			send_response(h, MSG_ERR);
+			return false;
+		}
+
 		/* try a read and retry if it fails */
 		if (!read_hdr(h, m)) {
 			if (!send_response(h, MSG_RETRY))
@@ -167,7 +185,11 @@ msg_read(MsgHandle *h, Msg *m)
 bool
 msg_write(MsgHandle *h, Msg *m)
 {
+	uint32_t start_time = h->get_time();
 	for (;;) {
+		if (timeout(h, start_time))
+			return false;
+
 		if (!write_hdr(h, m))
 			return false;
 

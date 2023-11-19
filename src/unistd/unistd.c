@@ -26,9 +26,17 @@ uread(MsgUnistdDev *d, void *b, size_t n)
 	return r == n;
 }
 
+/* FIXME: this could be implemented */
+static uint32_t
+get_time(void)
+{
+	return 0;
+}
+
 MsgHandle *
 msg_unistd_alloc(MsgUnistdDev *d)
 {
-	return msg_handle_alloc(d, (bool (*)(void *, void *, size_t))uwrite,
+	return msg_handle_alloc(d, 0, get_time,
+	                        (bool (*)(void *, void *, size_t))uwrite,
 	                        (bool (*)(void *, void *, size_t))uread);
 }
