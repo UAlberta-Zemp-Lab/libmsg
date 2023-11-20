@@ -30,6 +30,8 @@ msg_pipe(Msg *txm, Msg *rxm)
 	} else { /* parent process */
 		MsgUnistdDev d = { .rfd = child[0], .wfd = parent[1] };
 		MsgHandle *h = msg_unistd_alloc(&d);
+		if (!msg_available(h))
+			die("parent has no data available");
 		if (!msg_read(h, rxm))
 			die("parent failed to read msg");
 		free(h);

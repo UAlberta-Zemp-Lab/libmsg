@@ -3,6 +3,7 @@
 #include <msg/msg.h>
 #include <msg/msghandler.h>
 #include <msg/unistd.h>
+#include <poll.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <unistd.h>
@@ -33,10 +34,22 @@ get_time(void)
 	return 0;
 }
 
+static bool
+available(MsgUnistdDev *d)
+{
+	struct pollfd pfd = { .fd = d->rfd, .events = POLLIN };
+	/* could have a variable timeout but its a bit clunky */
+	int r = poll(&pfd, 1, 1);
+	if (r > 0)
+		if (pfd.revents & POLLIN)
+			return true;
+	return false;
+}
+
 MsgHandle *
 msg_unistd_alloc(MsgUnistdDev *d)
 {
-	return msg_handle_alloc(d, 0, get_time,
+	return msg_handle_alloc(d, 0, get_time, (bool (*)(void *))available,
 	                        (bool (*)(void *, void *, size_t))uwrite,
 	                        (bool (*)(void *, void *, size_t))uread);
 }

@@ -18,8 +18,11 @@ bool msg_write(MsgHandle *, Msg *);
 /* FIXME: should this be hidden? */
 MsgHandle *msg_handle_alloc(void *dev, uint32_t timeout,
                             uint32_t (*get_time)(void),
+                            bool (*available)(void *),
                             bool (*write)(void *, void *, size_t),
                             bool (*read)(void *, void *, size_t));
+
+bool msg_available(MsgHandle *);
 
 #ifdef __cplusplus
 }
