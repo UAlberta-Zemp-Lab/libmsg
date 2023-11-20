@@ -12,17 +12,17 @@ typedef struct MsgHandle MsgHandle;
 extern "C" {
 #endif
 
+bool msg_available(MsgHandle *);
 bool msg_read(MsgHandle *, Msg *);
 bool msg_write(MsgHandle *, Msg *);
 
 /* FIXME: should this be hidden? */
-MsgHandle *msg_handle_alloc(void *dev, uint32_t timeout,
-                            uint32_t (*get_time)(void),
-                            bool (*available)(void *),
-                            bool (*write)(void *, void *, size_t),
-                            bool (*read)(void *, void *, size_t));
-
-bool msg_available(MsgHandle *);
+MsgHandle *msg_handle_open(void *dev, uint32_t timeout,
+                           uint32_t (*get_time)(void),
+                           bool (*available)(void *),
+                           bool (*write)(void *, void *, size_t),
+                           bool (*read)(void *, void *, size_t));
+void msg_handle_close(MsgHandle *);
 
 #ifdef __cplusplus
 }

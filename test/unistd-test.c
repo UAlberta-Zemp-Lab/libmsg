@@ -23,18 +23,18 @@ msg_pipe(Msg *txm, Msg *rxm)
 	} else if (pid == 0) { /* child process */
 		/* could close() some fds but the child will exit anyways */
 		MsgUnistdDev d = { .rfd = parent[0], .wfd = child[1] };
-		MsgHandle *h = msg_unistd_alloc(&d);
+		MsgHandle *h = msg_unistd_open(&d);
 		if (!msg_write(h, txm))
 			die("child failed to write msg");
 		exit(0);
 	} else { /* parent process */
 		MsgUnistdDev d = { .rfd = child[0], .wfd = parent[1] };
-		MsgHandle *h = msg_unistd_alloc(&d);
+		MsgHandle *h = msg_unistd_open(&d);
 		if (!msg_available(h))
 			die("parent has no data available");
 		if (!msg_read(h, rxm))
 			die("parent failed to read msg");
-		free(h);
+		msg_handle_close(h);
 	}
 
 	close(parent[0]);

@@ -47,9 +47,9 @@ available(MsgUnistdDev *d)
 }
 
 MsgHandle *
-msg_unistd_alloc(MsgUnistdDev *d)
+msg_unistd_open(MsgUnistdDev *d)
 {
-	return msg_handle_alloc(d, 0, get_time, (bool (*)(void *))available,
-	                        (bool (*)(void *, void *, size_t))uwrite,
-	                        (bool (*)(void *, void *, size_t))uread);
+	return msg_handle_open(d, 0, get_time, (bool (*)(void *))available,
+	                       (bool (*)(void *, void *, size_t))uwrite,
+	                       (bool (*)(void *, void *, size_t))uread);
 }

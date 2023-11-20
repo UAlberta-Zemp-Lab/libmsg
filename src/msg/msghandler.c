@@ -16,10 +16,10 @@ struct MsgHandle {
 };
 
 MsgHandle *
-msg_handle_alloc(void *dev, uint32_t timeout, uint32_t (*get_time)(void),
-                 bool (*available)(void *),
-                 bool (*write)(void *, void *, size_t),
-                 bool (*read)(void *, void *, size_t))
+msg_handle_open(void *dev, uint32_t timeout, uint32_t (*get_time)(void),
+                bool (*available)(void *),
+                bool (*write)(void *, void *, size_t),
+                bool (*read)(void *, void *, size_t))
 {
 	MsgHandle *h = malloc(sizeof(MsgHandle));
 	h->dev = dev;
@@ -29,6 +29,12 @@ msg_handle_alloc(void *dev, uint32_t timeout, uint32_t (*get_time)(void),
 	h->write = write;
 	h->read = read;
 	return h;
+}
+
+void
+msg_handle_close(MsgHandle *h)
+{
+	free(h);
 }
 
 bool

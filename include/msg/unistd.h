@@ -16,7 +16,7 @@ typedef struct {
 } MsgUnistdDev;
 
 /* Prototypes */
-MsgHandle *msg_unistd_alloc(MsgUnistdDev *d);
+MsgHandle *msg_unistd_open(MsgUnistdDev *d);
 
 #ifdef __cplusplus
 }
