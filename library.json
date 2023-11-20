@@ -10,5 +10,12 @@
 		"url": "https://github.com/UAlberta-Zemp-Lab/libmsg.git"
 	},
 	"frameworks": "*",
-	"platforms": "*"
+	"platforms": "*",
+	"build": {
+		"srcFilter": [
+			"+<*>",
+			"-<unistd>",
+			"-<test>"
+		]
+	}
 }
