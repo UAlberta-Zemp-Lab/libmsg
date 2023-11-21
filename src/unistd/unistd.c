@@ -1,7 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 #include <errno.h>
 #include <msg/msg.h>
-#include <msg/msghandler.h>
+#include <msg/msgstream.h>
 #include <msg/unistd.h>
 #include <poll.h>
 #include <stdbool.h>
@@ -46,10 +46,10 @@ available(MsgUnistdDev *d)
 	return false;
 }
 
-MsgHandle *
-msg_unistd_open(MsgUnistdDev *d)
+void
+msg_unistd_init(MsgStream *s, MsgUnistdDev *d)
 {
-	return msg_handle_open(d, 0, get_time, (bool (*)(void *))available,
-	                       (bool (*)(void *, void *, size_t))uwrite,
-	                       (bool (*)(void *, void *, size_t))uread);
+	msg_stream_init(s, d, 0, get_time, (bool (*)(void *))available,
+	                (bool (*)(void *, void *, size_t))uwrite,
+	                (bool (*)(void *, void *, size_t))uread);
 }

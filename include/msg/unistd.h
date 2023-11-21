@@ -3,7 +3,7 @@
 #define _MSG_UNISTD_H
 
 #include <msg/msg.h>
-#include <msg/msghandler.h>
+#include <msg/msgstream.h>
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -16,7 +16,7 @@ typedef struct {
 } MsgUnistdDev;
 
 /* Prototypes */
-MsgHandle *msg_unistd_open(MsgUnistdDev *d);
+void msg_unistd_init(MsgStream *, MsgUnistdDev *);
 
 #ifdef __cplusplus
 }
