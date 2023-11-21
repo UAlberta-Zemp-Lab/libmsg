@@ -6,6 +6,6 @@ utils = static_library('utils', 'utils.c', include_directories: incdir)
 if posix
 	unistd = executable('unistd-test', 'unistd-test.c',
 	                     include_directories: incdir,
-	                     link_with: [utils, libmsg])
+	                     link_with: [utils, msg])
 	test('unistd', unistd)
 endif

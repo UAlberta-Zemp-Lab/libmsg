@@ -31,6 +31,7 @@ if posix
 	)
 endif
 
-libmsg = library('msg', c_sources, install: true, include_directories: incdir)
+msg = library('msg', c_sources, install: true, include_directories: incdir)
+libmsg = declare_dependency(link_with: msg, include_directories: incdir)
 
 subdir('test')
