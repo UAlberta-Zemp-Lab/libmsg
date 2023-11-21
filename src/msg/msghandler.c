@@ -7,14 +7,13 @@
 #include <stdlib.h>
 
 void
-msg_stream_init(MsgStream *s, void *dev, uint32_t timeout,
-                uint32_t (*get_time)(void), bool (*available)(void *),
+msg_stream_init(MsgStream *s, void *dev, uint32_t retries,
+                bool (*available)(void *),
                 bool (*write)(void *, void *, size_t),
                 bool (*read)(void *, void *, size_t))
 {
 	s->dev = dev;
-	s->timeout = timeout;
-	s->get_time = get_time;
+	s->retries = retries;
 	s->available = available;
 	s->write = write;
 	s->read = read;
@@ -114,13 +113,6 @@ send_response(MsgStream *s, uint16_t mt)
 	return write_hdr(s, &m);
 }
 
-static bool
-timeout(MsgStream *s, uint32_t start_time)
-{
-	uint32_t tstamp = s->get_time();
-	return (tstamp < start_time) || (tstamp - start_time > s->timeout);
-}
-
 /*
  * attempts to read a message from stream s
  * returns whether the operation succeeded
@@ -128,13 +120,7 @@ timeout(MsgStream *s, uint32_t start_time)
 bool
 msg_read(MsgStream *s, Msg *m)
 {
-	uint32_t start_time = s->get_time();
-	for (;;) {
-		if (timeout(s, start_time)) {
-			send_response(s, MSG_ERR);
-			return false;
-		}
-
+	for (uint32_t retries = s->retries; retries; retries--) {
 		/* try a read and retry if it fails */
 		if (!read_hdr(s, m)) {
 			if (!send_response(s, MSG_RETRY))
@@ -168,6 +154,9 @@ msg_read(MsgStream *s, Msg *m)
 
 		return send_response(s, MSG_ACK);
 	}
+	/* FIXME: should this send STOP ? */
+	send_response(s, MSG_ERR);
+	return false;
 }
 
 /*
@@ -177,11 +166,7 @@ msg_read(MsgStream *s, Msg *m)
 bool
 msg_write(MsgStream *s, Msg *m)
 {
-	uint32_t start_time = s->get_time();
-	for (;;) {
-		if (timeout(s, start_time))
-			return false;
-
+	for (uint32_t retries = s->retries; retries; retries--) {
 		if (!write_hdr(s, m))
 			return false;
 
@@ -208,4 +193,5 @@ msg_write(MsgStream *s, Msg *m)
 			return false;
 		}
 	}
+	return false;
 }

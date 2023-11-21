@@ -27,13 +27,6 @@ uread(MsgUnistdDev *d, void *b, size_t n)
 	return r == n;
 }
 
-/* FIXME: this could be implemented */
-static uint32_t
-get_time(void)
-{
-	return 0;
-}
-
 static bool
 available(MsgUnistdDev *d)
 {
@@ -49,7 +42,7 @@ available(MsgUnistdDev *d)
 void
 msg_unistd_init(MsgStream *s, MsgUnistdDev *d)
 {
-	msg_stream_init(s, d, 0, get_time, (bool (*)(void *))available,
+	msg_stream_init(s, d, 10, (bool (*)(void *))available,
 	                (bool (*)(void *, void *, size_t))uwrite,
 	                (bool (*)(void *, void *, size_t))uread);
 }

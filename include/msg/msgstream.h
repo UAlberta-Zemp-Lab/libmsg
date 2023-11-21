@@ -8,8 +8,7 @@
 /* generic message stream type */
 typedef struct {
 	void *dev;
-	uint32_t timeout;
-	uint32_t (*get_time)(void);
+	uint32_t retries;
 	bool (*available)(void *);
 	bool (*read)(void *, void *, size_t);
 	bool (*write)(void *, void *, size_t);
@@ -22,8 +21,8 @@ extern "C" {
 bool msg_read(MsgStream *, Msg *);
 bool msg_write(MsgStream *, Msg *);
 
-void msg_stream_init(MsgStream *s, void *dev, uint32_t timeout,
-                     uint32_t (*get_time)(void), bool (*available)(void *),
+void msg_stream_init(MsgStream *s, void *dev, uint32_t retries,
+                     bool (*available)(void *),
                      bool (*write)(void *, void *, size_t),
                      bool (*read)(void *, void *, size_t));
 
