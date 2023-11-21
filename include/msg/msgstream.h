@@ -18,13 +18,13 @@ typedef struct {
 extern "C" {
 #endif
 
-bool msg_read(MsgStream *, Msg *);
-bool msg_write(MsgStream *, Msg *);
+LIBMSG_API bool msg_read(MsgStream *, Msg *);
+LIBMSG_API bool msg_write(MsgStream *, Msg *);
 
-void msg_stream_init(MsgStream *s, void *dev, uint32_t retries,
-                     bool (*available)(void *),
-                     bool (*write)(void *, void *, size_t),
-                     bool (*read)(void *, void *, size_t));
+LIBMSG_API void msg_stream_init(MsgStream *s, void *dev, uint32_t retries,
+                                bool (*available)(void *),
+                                bool (*write)(void *, void *, size_t),
+                                bool (*read)(void *, void *, size_t));
 
 #ifdef __cplusplus
 }

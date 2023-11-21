@@ -2,21 +2,23 @@
 #ifndef _MSG_UNISTD_H
 #define _MSG_UNISTD_H
 
+#include <msg/platform.h>
+
 #include <msg/msg.h>
 #include <msg/msgstream.h>
 #include <stdbool.h>
 #include <stdio.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef struct {
 	int wfd, rfd;
 } MsgUnistdDev;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Prototypes */
-void msg_unistd_init(MsgStream *, MsgUnistdDev *);
+LIBMSG_API void msg_unistd_init(MsgStream *, MsgUnistdDev *);
 
 #ifdef __cplusplus
 }

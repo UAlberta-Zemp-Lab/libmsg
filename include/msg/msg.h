@@ -2,6 +2,8 @@
 #ifndef _MSG_H
 #define _MSG_H
 
+#include <msg/platform.h>
+
 #include <msg/msgtypes.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -18,8 +20,8 @@ extern "C" {
 #endif
 
 /* Prototypes */
-bool msg_alloc(Msg *);
-void msg_free(Msg *);
+LIBMSG_API bool msg_alloc(Msg *);
+LIBMSG_API void msg_free(Msg *);
 
 #ifdef __cplusplus
 }
