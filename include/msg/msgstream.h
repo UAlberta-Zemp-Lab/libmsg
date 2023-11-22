@@ -5,10 +5,16 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#define MSG_FLAG_MODE 0
+
+#define MSG_MODE_MASTER (0 << MSG_FLAG_MODE)
+#define MSG_MODE_SLAVE  (1 << MSG_FLAG_MODE)
+
 /* generic message stream type */
 typedef struct {
 	void *dev;
 	uint32_t retries;
+	uint8_t flags;
 	bool (*available)(void *);
 	bool (*read)(void *, void *, size_t);
 	bool (*write)(void *, void *, size_t);

@@ -7,13 +7,14 @@
 #include <stdlib.h>
 
 void
-msg_stream_init(MsgStream *s, void *dev, uint32_t retries,
+msg_stream_init(MsgStream *s, void *dev, uint32_t retries, uint8_t flags,
                 bool (*available)(void *),
                 bool (*write)(void *, void *, size_t),
                 bool (*read)(void *, void *, size_t))
 {
 	s->dev = dev;
 	s->retries = retries;
+	s->flags = flags;
 	s->available = available;
 	s->write = write;
 	s->read = read;
@@ -178,6 +179,9 @@ msg_write(MsgStream *s, Msg *m)
 		case MSG_ACK:
 			return true;
 		default:
+			/* Possible simultaneous write */
+			if (s->flags & MSG_MODE_MASTER)
+				continue;
 			return false;
 		}
 

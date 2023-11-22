@@ -9,6 +9,6 @@
 #include <msg/msgstream.h>
 #include <stdint.h>
 
-LIBMSG_API void msg_arduino_init(MsgStream *, Stream *);
+LIBMSG_API void msg_arduino_init(MsgStream *, Stream *, uint8_t flags);
 
 #endif /* _MSG_ARDUINO_H */

@@ -40,9 +40,9 @@ available(MsgUnistdDev *d)
 }
 
 void
-msg_unistd_init(MsgStream *s, MsgUnistdDev *d)
+msg_unistd_init(MsgStream *s, MsgUnistdDev *d, uint8_t flags)
 {
-	msg_stream_init(s, d, 10, (bool (*)(void *))available,
+	msg_stream_init(s, d, 10, flags, (bool (*)(void *))available,
 	                (bool (*)(void *, void *, size_t))uwrite,
 	                (bool (*)(void *, void *, size_t))uread);
 }

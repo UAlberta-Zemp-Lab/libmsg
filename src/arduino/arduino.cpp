@@ -26,7 +26,7 @@ available(Stream *s)
 }
 
 void
-msg_arduino_init(MsgStream *ms, Stream *s)
+msg_arduino_init(MsgStream *ms, Stream *s, uint8_t flags)
 {
 	msg_stream_init(ms, s, 10, (bool (*)(void *))available,
 	                (bool (*)(void *, void *, size_t))awrite,

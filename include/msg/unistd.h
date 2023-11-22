@@ -18,7 +18,7 @@ extern "C" {
 #endif
 
 /* Prototypes */
-LIBMSG_API void msg_unistd_init(MsgStream *, MsgUnistdDev *);
+LIBMSG_API void msg_unistd_init(MsgStream *, MsgUnistdDev *, uint8_t flags);
 
 #ifdef __cplusplus
 }
