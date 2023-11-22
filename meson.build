@@ -29,6 +29,9 @@ c_sources = files(
 cpp_sources = files(
 	'src/msg/Msg.cpp',
 	'src/msg/MsgHandler.cpp',
+	'src/msg/communicator/SerialCommunicator.cpp',
+	'src/msg/communicator/WorkerThread.cpp',
+	'src/msg/MsgLog.cpp',
 )
 
 if posix

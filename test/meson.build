@@ -27,6 +27,7 @@ cpp_testSources += files(
 	'msglib_cpp_tests.cpp',
 	'MsgTest.cpp',
 	'MsgHandlerTest.cpp',
+	'SerialCommunicatorTest.cpp'
 )
 
 MsgTest = executable('MsgTest', cpp_testSources, include_directories: [incdir, incdirTest], link_with: [msg_cpp])
