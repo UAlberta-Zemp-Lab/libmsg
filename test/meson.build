@@ -12,3 +12,11 @@ if posix
 	                     link_with: [utils, msg])
 	test('unistd', unistd)
 endif
+
+cpp_testSources = files(
+	'MsgTest.cpp',
+)
+
+MsgTest = executable('MsgTest', cpp_testSources, include_directories: incdir, link_with: [msg_cpp])
+
+test('MsgTest', MsgTest)
