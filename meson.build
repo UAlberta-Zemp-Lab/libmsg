@@ -4,6 +4,7 @@ project('libmsg',
 	version: files('./VERSION'),
 	default_options: [
 		'c_std=c99',
+		'cpp_std=c++20',
 		'debug=false',
 		'default_library=both',
 		'optimization=s',
@@ -25,6 +26,10 @@ c_sources = files(
 	# Backends
 )
 
+cpp_sources = files(
+	'src/msg/Msg.cpp',
+)
+
 if posix
 	c_sources += files(
 		# Backends
@@ -32,7 +37,11 @@ if posix
 	)
 endif
 
+
 msg = library('msg', c_sources, install: true, include_directories: incdir)
-libmsg = declare_dependency(link_with: msg, include_directories: incdir)
+msg_cpp = library('msg_cpp', cpp_sources, install: true, include_directories: incdir)
+
+libmsg_dep = declare_dependency(link_with : msg, include_directories : incdir)
+libmsg_cpp_dep = declare_dependency(link_with : msg_cpp, include_directories : incdir)
 
 subdir('test')
