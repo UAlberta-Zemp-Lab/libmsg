@@ -28,7 +28,7 @@ LIBMSG_API bool msg_read(MsgStream *, Msg *);
 LIBMSG_API bool msg_write(MsgStream *, Msg *);
 
 LIBMSG_API void msg_stream_init(MsgStream *s, void *dev, uint32_t retries,
-                                bool (*available)(void *),
+                                uint8_t flags, bool (*available)(void *),
                                 bool (*write)(void *, void *, size_t),
                                 bool (*read)(void *, void *, size_t));
 
