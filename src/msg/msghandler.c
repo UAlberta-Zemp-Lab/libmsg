@@ -130,12 +130,14 @@ msg_read(MsgStream *s, Msg *m)
 		}
 
 		switch (m->type) {
-		case MSG_STOP:
-			return true;
 		case MSG_ACK:
 		case MSG_CONTINUE:
+		case MSG_ERR:
 		case MSG_RETRY:
-			return send_response(s, MSG_STOP);
+			send_response(s, MSG_STOP);
+			/* FALLTHROUGH */
+		case MSG_STOP:
+			return false;
 		}
 
 		if (m->length > 0) {
