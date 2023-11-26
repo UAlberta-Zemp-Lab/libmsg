@@ -1,10 +1,8 @@
 /* See LICENSE file for copyright and license details. */
-#include <errno.h>
 #include <msg/msg.h>
 #include <msg/msgstream.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdlib.h>
 
 void
 msg_stream_init(MsgStream *s, void *dev, uint8_t flags, uint32_t retries,
@@ -46,15 +44,17 @@ read_hdr(MsgStream *s, Msg *m)
  * allocates and reads into Msg m->data
  * returns whether the operation succeeded
  */
-static bool
+static int
 read_data(MsgStream *s, Msg *m)
 {
-	if (!msg_alloc(m)
-	    || (m->length > 0 && !read_bytes(s, m->data, m->length))) {
+	if (!msg_alloc(m))
+		return -1;
+
+	if (m->length > 0 && !read_bytes(s, m->data, m->length)) {
 		msg_free(m);
-		return false;
+		return 0;
 	}
-	return true;
+	return 1;
 }
 
 /*
@@ -144,11 +144,11 @@ msg_read(MsgStream *s, Msg *m)
 			if (!send_response(s, MSG_CONTINUE))
 				return false;
 
-			if (!read_data(s, m)) {
-				if (errno == ENOMEM) {
-					send_response(s, MSG_ERR);
-					return false;
-				}
+			int r = read_data(s, m);
+			if (r == -1) { /* failed allocation */
+				send_response(s, MSG_ERR);
+				return false;
+			} else if (r == 0) { /* failed read */
 				if (!send_response(s, MSG_RETRY))
 					return false;
 				continue;
