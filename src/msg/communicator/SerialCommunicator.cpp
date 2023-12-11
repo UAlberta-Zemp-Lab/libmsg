@@ -104,8 +104,8 @@ SerialCommunicator::listen() {
 
 		if (serial->numberOfBytesAvailable() >= Msg::sizeOfHeader) {
 			try {
-				msg::Msg receiveMsg =
-				    msg::MsgHandler::readMsg(*serial);
+				msg::MsgHandler handler;
+				msg::Msg receiveMsg = handler.readMsg(*serial);
 				receiveLog->push(std::pair<timeStamp, Msg>(
 				    std::chrono::high_resolution_clock::now(),
 				    receiveMsg));
@@ -164,9 +164,9 @@ SerialCommunicator::processRequest(Request request) {
 				while (serial->isDataAvailable()) {
 					try {
 						serial->flushWrite();
+						MsgHandler handler;
 						Msg receiveMsg =
-						    MsgHandler::readMsg(
-							*serial);
+						    handler.readMsg(*serial);
 						receiveLog->push(std::pair<
 								 timeStamp,
 								 Msg>(
@@ -182,8 +182,10 @@ SerialCommunicator::processRequest(Request request) {
 					}
 				}
 
-				MsgHandler::writeMsg(
-				    request.transmitMsg.value(), *serial);
+				MsgHandler handler;
+				handler.retries = 10;
+				handler.writeMsg(request.transmitMsg.value(),
+				                 *serial);
 
 				if (request.transmitPromise) {
 					request.transmitPromise.value()
@@ -192,7 +194,8 @@ SerialCommunicator::processRequest(Request request) {
 
 				break;
 			} catch (std::exception &x) {
-				if (std::string(x.what()).compare("sWrite")) {
+				if (std::string(x.what()).compare("sWrite")
+				    == 0) {
 					continue;
 				}
 				if (request.transmitPromise) {
@@ -217,8 +220,15 @@ SerialCommunicator::processRequest(Request request) {
 	if (request.receivePromise) {
 		while (true) {
 			try {
+				for (unsigned int tries = 100; tries; tries--) {
+					if (serial->isDataAvailable())
+						break;
+					std::this_thread::sleep_for(
+					    std::chrono::microseconds(500));
+				}
+				MsgHandler handler;
 				serial->flushWrite();
-				Msg receiveMsg = MsgHandler::readMsg(*serial);
+				Msg receiveMsg = handler.readMsg(*serial);
 				if (receiveMsg.type() == MsgType::DEBUG) {
 					receiveLog->push(std::pair<timeStamp,
 					                           Msg>(

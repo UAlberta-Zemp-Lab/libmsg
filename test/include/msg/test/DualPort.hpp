@@ -1,5 +1,6 @@
 #ifndef _MSG_DUALPORT_HPP
 #define _MSG_DUALPORT_HPP
+#include <iostream>
 #include <memory>
 #include <msg/Stream.hpp>
 #include <queue>
@@ -82,7 +83,7 @@ DualPort<T>::Port::read(unsigned int len) {
 		std::unique_lock<std::mutex> readLock(this->readMtx);
 
 		readCondition.wait_for(
-		    readLock, std::chrono::microseconds(100),
+		    readLock, std::chrono::microseconds(1),
 		    [this] { return this->readQueue.size() > 0; });
 
 		// If Data available

@@ -9,13 +9,13 @@
 namespace msg {
 class MsgHandler {
 public:
-	static Msg readMsg(Stream<uint8_t> &);
-	static void writeMsg(const Msg &, Stream<uint8_t> &);
+	Msg readMsg(Stream<uint8_t> &);
+	void writeMsg(const Msg &, Stream<uint8_t> &);
 
-	static unsigned int retries;
+	unsigned int retries = 0;
 
 protected:
-	static uint16_t checkResponse(Stream<uint8_t> &);
+	uint16_t checkResponse(Stream<uint8_t> &);
 };
 } // namespace msg
 
