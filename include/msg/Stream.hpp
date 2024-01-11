@@ -6,9 +6,14 @@
 #include <vector>
 
 namespace msg {
+struct StreamOptions {
+	enum WritePriority { Master, Slave };
+	WritePriority WritePriority = WritePriority::Master;
+};
+
 template <class T> class Stream {
 public:
-	uint8_t flags = 0x0;
+	StreamOptions options;
 	virtual void write(const std::vector<T> data) = 0;
 	virtual std::vector<T> read(unsigned int len) = 0;
 	Stream<T> &operator<<(const std::vector<T> &data) {
