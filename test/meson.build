@@ -19,9 +19,9 @@ cpp_testSources = files(
 	'include/msg/test/DualPort.hpp',
 )
 
-libmsg_cpp_test = library('msg_cpp_test', cpp_testSources, install: true, include_directories: [incdirTest], dependencies: [libmsg_cpp_dep])
+msg_cpp_test = library('msg++_test', cpp_testSources, install: true, include_directories: [incdirTest], link_with: [msg_cpp])
 
-libmsg_cpp_test_dep = declare_dependency(include_directories : incdirTest, link_with : libmsg_cpp_test)
+libmsg_cpp_test_dep = declare_dependency(include_directories : incdirTest, link_with : msg_cpp_test)
 
 cpp_testSources += files(
 	'msglib_cpp_tests.cpp',

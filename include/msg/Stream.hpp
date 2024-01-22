@@ -25,6 +25,7 @@ public:
 		data.assign(readData.begin(), readData.end());
 		return *this;
 	}
+	virtual ~Stream() = default;
 };
 
 template <class T> class Serial : public Stream<T> {

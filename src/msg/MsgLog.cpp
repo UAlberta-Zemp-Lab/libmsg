@@ -19,7 +19,7 @@ MsgLog::operator=(MsgLog other) {
 	swap(*this, other);
 	return *this;
 }
-MsgLog::~MsgLog() { std::lock_guard lock(mtx); }
+MsgLog::~MsgLog() = default;
 inline void
 swap(MsgLog &first, MsgLog &second) noexcept {
 	using std::swap;

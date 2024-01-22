@@ -1,5 +1,6 @@
 #ifndef _MSG_DUALPORT_HPP
 #define _MSG_DUALPORT_HPP
+#include <condition_variable>
 #include <iostream>
 #include <memory>
 #include <msg/Stream.hpp>
@@ -12,30 +13,41 @@ public:
 	class Port;
 
 	DualPort()
-	    : queueAtoB(), queueBtoA(),
-	      A(queueBtoA, queueAtoB, mtxBtoA, mtxAtoB, conditionBtoA,
-	        conditionAtoB),
-	      B(queueAtoB, queueBtoA, mtxAtoB, mtxBtoA, conditionAtoB,
-	        conditionBtoA) {}
+	    : A(std::make_shared<Port>(queueBtoA, queueAtoB, mtxBtoA, mtxAtoB,
+	                               conditionBtoA, conditionAtoB)),
+	      B(std::make_shared<Port>(queueAtoB, queueBtoA, mtxAtoB, mtxBtoA,
+	                               conditionAtoB, conditionBtoA)) {}
 
-	std::pair<Port &, Port &> GetPorts() {
-		return std::pair<Port &, Port &>(this->A, this->B);
+	std::pair<std::shared_ptr<Port>, std::shared_ptr<Port>> GetPorts() {
+		return { A, B };
 	}
 
 private:
-	std::queue<T> queueAtoB;
-	std::queue<T> queueBtoA;
-	std::mutex mtxAtoB;
-	std::mutex mtxBtoA;
-	std::condition_variable conditionAtoB;
-	std::condition_variable conditionBtoA;
-	Port A;
-	Port B;
+	std::shared_ptr<std::queue<T>> queueAtoB =
+	    std::make_shared<std::queue<T>>();
+	std::shared_ptr<std::queue<T>> queueBtoA =
+	    std::make_shared<std::queue<T>>();
+	std::shared_ptr<std::mutex> mtxAtoB = std::make_shared<std::mutex>();
+	std::shared_ptr<std::mutex> mtxBtoA = std::make_shared<std::mutex>();
+	std::shared_ptr<std::condition_variable> conditionAtoB =
+	    std::make_shared<std::condition_variable>();
+	std::shared_ptr<std::condition_variable> conditionBtoA =
+	    std::make_shared<std::condition_variable>();
+	std::shared_ptr<Port> A;
+	std::shared_ptr<Port> B;
 };
 
 template <typename T> class DualPort<T>::Port : public msg::Serial<T> {
 public:
-	friend class DualPort;
+	Port(std::shared_ptr<std::queue<T>> readQueue,
+	     std::shared_ptr<std::queue<T>> writeQueue,
+	     std::shared_ptr<std::mutex> readMtx,
+	     std::shared_ptr<std::mutex> writeMtx,
+	     std::shared_ptr<std::condition_variable> readCondition,
+	     std::shared_ptr<std::condition_variable> writeCondition)
+	    : readQueue(readQueue), writeQueue(writeQueue), readMtx(readMtx),
+	      writeMtx(writeMtx), readCondition(readCondition),
+	      writeCondition(writeCondition) {}
 	std::vector<T> read(unsigned int len);
 	void write(const std::vector<T> data);
 
@@ -48,20 +60,21 @@ public:
 	void setTimeouts(std::chrono::microseconds readTimeout,
 	                 std::chrono::microseconds writeTimeout);
 
+	inline void static swap(DualPort<T>::Port &first,
+	                        DualPort<T>::Port &second) {
+		using std::swap;
+
+		swap(first.readTimeout, second.readTimeout);
+		swap(first.writeTimeout, second.writeTimeout);
+	}
+
 private:
-	Port(std::queue<T> &readQueue, std::queue<T> &writeQueue,
-	     std::mutex &readMtx, std::mutex &writeMtx,
-	     std::condition_variable &readCondition,
-	     std::condition_variable &writeCondition)
-	    : readQueue(readQueue), writeQueue(writeQueue), readMtx(readMtx),
-	      writeMtx(writeMtx), readCondition(readCondition),
-	      writeCondition(writeCondition) {}
-	std::queue<T> &readQueue;
-	std::queue<T> &writeQueue;
-	std::mutex &readMtx;
-	std::mutex &writeMtx;
-	std::condition_variable &readCondition;
-	std::condition_variable &writeCondition;
+	std::shared_ptr<std::queue<T>> readQueue;
+	std::shared_ptr<std::queue<T>> writeQueue;
+	std::shared_ptr<std::mutex> readMtx;
+	std::shared_ptr<std::mutex> writeMtx;
+	std::shared_ptr<std::condition_variable> readCondition;
+	std::shared_ptr<std::condition_variable> writeCondition;
 	std::chrono::microseconds readTimeout = std::chrono::milliseconds(1000);
 	std::chrono::microseconds writeTimeout =
 	    std::chrono::milliseconds(1000);
@@ -81,17 +94,17 @@ DualPort<T>::Port::read(unsigned int len) {
 	};
 
 	do {
-		std::unique_lock<std::mutex> readLock(this->readMtx);
+		std::unique_lock<std::mutex> readLock(*readMtx);
 
-		readCondition.wait_for(
+		readCondition->wait_for(
 		    readLock, std::chrono::microseconds(1),
-		    [this] { return this->readQueue.size() > 0; });
+		    [this] { return readQueue->size() > 0; });
 
 		// If Data available
-		while (this->readQueue.size() > 0 && output.size() < len) {
+		while (readQueue->size() > 0 && output.size() < len) {
 			// Read Data & delete from buffer
-			output.push_back(this->readQueue.front());
-			this->readQueue.pop();
+			output.push_back(readQueue->front());
+			readQueue->pop();
 		}
 		// If finished reading, end
 		if (output.size() == len) {
@@ -111,13 +124,13 @@ void
 DualPort<T>::Port::write(const std::vector<T> data) {
 	// Multi-thread write saftey
 	{
-		auto lock = std::lock_guard(this->writeMtx);
+		auto lock = std::lock_guard(*writeMtx);
 
 		for (auto d : data) {
-			this->writeQueue.push(d);
+			writeQueue->push(d);
 		}
 	}
-	this->writeCondition.notify_one();
+	writeCondition->notify_one();
 }
 
 template <typename T>
@@ -131,10 +144,10 @@ template <typename T>
 void
 DualPort<T>::Port::flushRead() {
 	// Multi-thread read saftey
-	auto lock = std::lock_guard(this->readMtx);
+	auto lock = std::lock_guard(*readMtx);
 
-	while (this->readQueue.size() > 0) {
-		this->readQueue.pop(); // Potential data race with writer
+	while (readQueue->size() > 0) {
+		readQueue->pop(); // Potential data race with writer
 	}
 }
 
@@ -142,37 +155,37 @@ template <typename T>
 void
 DualPort<T>::Port::flushWrite() {
 	// Multi-thread write saftey
-	auto lock = std::lock_guard(this->writeMtx);
+	auto lock = std::lock_guard(*writeMtx);
 
-	while (this->writeQueue.size() > 0) {
-		this->writeQueue.pop(); // Potential data race with reader
+	while (writeQueue->size() > 0) {
+		writeQueue->pop(); // Potential data race with reader
 	}
 }
 
 template <typename T>
 unsigned int
 DualPort<T>::Port::numberOfBytesAvailable() const {
-	return this->readQueue.size();
+	return static_cast<unsigned int>(readQueue->size());
 }
 
 template <typename T>
 bool
 DualPort<T>::Port::isDataAvailable() const {
-	return !this->readQueue.empty();
+	return !readQueue->empty();
 }
 
 template <typename T>
 bool
 DualPort<T>::Port::isConnected() const {
-	return true;
+	return readQueue.use_count() > 1 && writeQueue.use_count() > 1;
 }
 
 template <typename T>
 void
-DualPort<T>::Port::setTimeouts(std::chrono::microseconds readTimeout,
-                               std::chrono::microseconds writeTimeout) {
-	this->readTimeout = readTimeout;
-	this->writeTimeout = writeTimeout;
+DualPort<T>::Port::setTimeouts(std::chrono::microseconds _readTimeout,
+                               std::chrono::microseconds _writeTimeout) {
+	this->readTimeout = _readTimeout;
+	this->writeTimeout = _writeTimeout;
 }
 } // namespace msg
 #endif

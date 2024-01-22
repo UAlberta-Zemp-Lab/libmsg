@@ -26,8 +26,8 @@ checkMsgHandling(const Msg &message, Stream<uint8_t> &portA,
 
 inline void
 checkMsgCommunication(const Msg &message,
-                      std::unique_ptr<Serial<uint8_t>> &portA,
-                      std::unique_ptr<Serial<uint8_t>> &portB) {
+                      std::shared_ptr<Serial<uint8_t>> portA,
+                      std::shared_ptr<Serial<uint8_t>> portB) {
 	msg::Msg receivedMsg;
 
 	// Set And Release
@@ -36,31 +36,28 @@ checkMsgCommunication(const Msg &message,
 		msg::SerialCommunicator commA;
 		msg::SerialCommunicator commB;
 
-		commA.setDevice(std::move(portA));
-		commB.setDevice(std::move(portB));
+		commA.setDevice(portA);
+		commB.setDevice(portB);
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(15));
 
-		portA = commA.releaseDevice();
-		portB = commB.releaseDevice();
+		commA.releaseDevice();
+		commB.releaseDevice();
 	}
 
 	// No Communication
 	{
 
-		msg::SerialCommunicator commA(std::move(portA));
-		msg::SerialCommunicator commB(std::move(portB));
+		msg::SerialCommunicator commA(portA);
+		msg::SerialCommunicator commB(portB);
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(15));
-
-		portA = commA.releaseDevice();
-		portB = commB.releaseDevice();
 	}
 
 	// Transmit & Receive
 	{
-		msg::SerialCommunicator commA(std::move(portA));
-		msg::SerialCommunicator commB(std::move(portB));
+		msg::SerialCommunicator commA(portA);
+		msg::SerialCommunicator commB(portB);
 		auto receiveFuture = commB.receive();
 		commA.transmit(message);
 		receivedMsg = receiveFuture.get();
@@ -74,8 +71,8 @@ checkMsgCommunication(const Msg &message,
 
 	// Exchange
 	{
-		msg::SerialCommunicator commA(std::move(portA));
-		msg::SerialCommunicator commB(std::move(portB));
+		msg::SerialCommunicator commA(portA);
+		msg::SerialCommunicator commB(portB);
 		auto receiveFuture = commB.receive();
 		auto exchangedFuture = commA.exchange(message);
 		receivedMsg = receiveFuture.get();
@@ -87,8 +84,8 @@ checkMsgCommunication(const Msg &message,
 
 	// Transmit & Receive by Listening
 	{
-		msg::SerialCommunicator commA(std::move(portA));
-		msg::SerialCommunicator commB(std::move(portB));
+		msg::SerialCommunicator commA(portA);
+		msg::SerialCommunicator commB(portB);
 		commA.transmit(message);
 		std::this_thread::sleep_for(std::chrono::milliseconds(15));
 		assert(commB.receiveLog->size() == 1);

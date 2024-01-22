@@ -27,12 +27,12 @@ public:
 	class WorkerThread;
 
 	SerialCommunicator();
-	SerialCommunicator(std::unique_ptr<Serial<uint8_t>> s);
+	SerialCommunicator(std::shared_ptr<Serial<uint8_t>> s);
 	~SerialCommunicator();
 
-	void setDevice(std::unique_ptr<Serial<uint8_t>> s);
-	std::unique_ptr<Serial<uint8_t>> releaseDevice();
-	bool isConnected();
+	void setDevice(std::shared_ptr<Serial<uint8_t>> s);
+	std::shared_ptr<Serial<uint8_t>> releaseDevice();
+	bool isConnected() const;
 
 	// Only valid while a device is connected
 	std::future<Msg>
@@ -50,8 +50,7 @@ public:
 	    std::chrono::milliseconds(10);
 
 protected:
-	std::unique_ptr<Serial<uint8_t>> serial;
-	MsgHandler handler;
+	std::shared_ptr<Serial<uint8_t>> serial;
 	std::mutex serialMtx;
 
 	std::unique_ptr<WorkerThread> worker;

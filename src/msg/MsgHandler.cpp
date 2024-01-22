@@ -1,12 +1,12 @@
 /* See LICENSE file for copyright and license details. */
 #include <iostream>
 #include <msg/MsgHandler.hpp>
+#include <msg/unistd.h>
 #include <mutex>
 #include <sstream>
 #include <stdbool.h>
 #include <stdexcept>
 #include <stdint.h>
-#include <unistd.h>
 #include <vector>
 
 /*
@@ -43,7 +43,7 @@ msg::MsgHandler::readMsg(Stream<uint8_t> &stream) {
 			try {
 				stream << Msg(MsgType::CONTINUE);
 				readMsg.readData(stream.read(readMsg.length()));
-			} catch (std::bad_alloc &x) {
+			} catch (std::bad_alloc &) {
 				stream << Msg(MsgType::ERR);
 				throw;
 			} catch (const std::exception &x) {

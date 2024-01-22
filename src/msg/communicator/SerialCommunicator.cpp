@@ -12,7 +12,7 @@ SerialCommunicator::SerialCommunicator()
 			   *serial, serialMtx,
 			   std::bind(&SerialCommunicator::processRequest, this,
                                      std::placeholders::_1))){};
-SerialCommunicator::SerialCommunicator(std::unique_ptr<Serial<uint8_t>> s)
+SerialCommunicator::SerialCommunicator(std::shared_ptr<Serial<uint8_t>> s)
     : serial(std::move(s)), worker(std::make_unique<WorkerThread>(
 				*serial, serialMtx,
 				std::bind(&SerialCommunicator::processRequest,
@@ -31,10 +31,8 @@ SerialCommunicator::~SerialCommunicator() {
 }
 
 void
-SerialCommunicator::setDevice(std::unique_ptr<Serial<uint8_t>> s) {
-	if (serial) {
-		stop();
-	}
+SerialCommunicator::setDevice(std::shared_ptr<Serial<uint8_t>> s) {
+	stop();
 	serial = std::move(s);
 	worker = std::make_unique<WorkerThread>(
 	    std::move(*worker), *s, serialMtx,
@@ -43,16 +41,16 @@ SerialCommunicator::setDevice(std::unique_ptr<Serial<uint8_t>> s) {
 	start();
 }
 
-std::unique_ptr<Serial<uint8_t>>
+std::shared_ptr<Serial<uint8_t>>
 SerialCommunicator::releaseDevice() {
 	stop();
-	std::unique_ptr<Serial<uint8_t>> ptr = nullptr;
+	std::shared_ptr<Serial<uint8_t>> ptr = nullptr;
 	swap(ptr, serial);
 	return ptr;
 }
 
 bool
-SerialCommunicator::isConnected() {
+SerialCommunicator::isConnected() const {
 	return serial && serial->isConnected();
 }
 
@@ -122,6 +120,9 @@ SerialCommunicator::listen() {
 
 void
 SerialCommunicator::start() {
+	if (!serial) {
+		return;
+	}
 	if (running) {
 		throw std::runtime_error("Started when running");
 	}
@@ -140,6 +141,9 @@ SerialCommunicator::start() {
 
 void
 SerialCommunicator::stop() {
+	if (!serial) {
+		return;
+	}
 	if (!running) {
 		throw std::runtime_error("Stopped when not running");
 	}

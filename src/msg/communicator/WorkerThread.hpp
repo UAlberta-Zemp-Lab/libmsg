@@ -9,8 +9,8 @@
 #include <msg/SerialCommunicator.hpp>
 
 namespace msg {
-struct SerialCommunicator::WorkerThread {
-
+class SerialCommunicator::WorkerThread {
+public:
 	WorkerThread(Serial<uint8_t> &serial, std::mutex &serialMtx,
 	             std::function<void(Request)> processFunction)
 	    : serial(serial), serialMtx(serialMtx),
