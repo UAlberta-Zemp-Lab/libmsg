@@ -3,11 +3,10 @@
 
 void
 testMsgHandling() {
-	msg::DualPort<uint8_t> dualPort;
-	auto ports = dualPort.GetPorts();
+	auto ports = msg::Port<uint8_t>::GetPair();
 	const msg::Msg message =
 	    msg::Msg(0x5678, 5, std::vector<uint8_t>{ 1, 2, 3, 4, 5 });
-	msg::checkMsgHandling(message, *ports.first, *ports.second);
+	msg::checkMsgHandling(message, ports.first, ports.second);
 }
 
 void

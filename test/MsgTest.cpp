@@ -38,6 +38,10 @@ testConstructors() {
 				  });
 	bytes.insert(bytes.end(), data.begin(), data.end());
 
+	assert(msg.type() == msg::MsgType::ERR);
+	assert(msg.length() == 0);
+	assert(msg.data().empty());
+
 	msg = msg::Msg();
 	assert(msg.type() == msg::MsgType::ERR);
 	assert(msg.length() == 0);

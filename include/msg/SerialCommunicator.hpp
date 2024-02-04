@@ -17,7 +17,7 @@ class SerialCommunicator {
 	    std::chrono::time_point<std::chrono::high_resolution_clock>;
 
 public:
-	class Request;
+	struct Request;
 	enum class RequestPriority : unsigned int {
 		CRITICAL = 0,
 		HIGH = 1,

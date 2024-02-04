@@ -8,46 +8,10 @@
 #include <vector>
 
 namespace msg {
-template <typename T> class DualPort {
+template <typename T> class Port : public msg::Serial<T> {
 public:
-	class Port;
+	static std::pair<Port<T>, Port<T>> GetPair();
 
-	DualPort()
-	    : A(std::make_shared<Port>(queueBtoA, queueAtoB, mtxBtoA, mtxAtoB,
-	                               conditionBtoA, conditionAtoB)),
-	      B(std::make_shared<Port>(queueAtoB, queueBtoA, mtxAtoB, mtxBtoA,
-	                               conditionAtoB, conditionBtoA)) {}
-
-	std::pair<std::shared_ptr<Port>, std::shared_ptr<Port>> GetPorts() {
-		return { A, B };
-	}
-
-private:
-	std::shared_ptr<std::queue<T>> queueAtoB =
-	    std::make_shared<std::queue<T>>();
-	std::shared_ptr<std::queue<T>> queueBtoA =
-	    std::make_shared<std::queue<T>>();
-	std::shared_ptr<std::mutex> mtxAtoB = std::make_shared<std::mutex>();
-	std::shared_ptr<std::mutex> mtxBtoA = std::make_shared<std::mutex>();
-	std::shared_ptr<std::condition_variable> conditionAtoB =
-	    std::make_shared<std::condition_variable>();
-	std::shared_ptr<std::condition_variable> conditionBtoA =
-	    std::make_shared<std::condition_variable>();
-	std::shared_ptr<Port> A;
-	std::shared_ptr<Port> B;
-};
-
-template <typename T> class DualPort<T>::Port : public msg::Serial<T> {
-public:
-	Port(std::shared_ptr<std::queue<T>> readQueue,
-	     std::shared_ptr<std::queue<T>> writeQueue,
-	     std::shared_ptr<std::mutex> readMtx,
-	     std::shared_ptr<std::mutex> writeMtx,
-	     std::shared_ptr<std::condition_variable> readCondition,
-	     std::shared_ptr<std::condition_variable> writeCondition)
-	    : readQueue(readQueue), writeQueue(writeQueue), readMtx(readMtx),
-	      writeMtx(writeMtx), readCondition(readCondition),
-	      writeCondition(writeCondition) {}
 	std::vector<T> read(unsigned int len);
 	void write(const std::vector<T> data);
 
@@ -60,15 +24,33 @@ public:
 	void setTimeouts(std::chrono::microseconds readTimeout,
 	                 std::chrono::microseconds writeTimeout);
 
-	inline void static swap(DualPort<T>::Port &first,
-	                        DualPort<T>::Port &second) {
+	Port(const Port<T> &) = default;
+	Port(Port<T> &&);
+	Port<T> &operator=(Port<T>);
+	~Port() = default;
+	inline void static swap(Port<T> &first, Port<T> &second) {
 		using std::swap;
 
+		swap(first.readQueue, second.readQueue);
+		swap(first.writeQueue, second.writeQueue);
+		swap(first.readMutex, second.readMutex);
+		swap(first.writeMutex, second.writeMutex);
+		swap(first.readCondition, second.readCondition);
+		swap(first.writeCondition, second.writeCondition);
 		swap(first.readTimeout, second.readTimeout);
 		swap(first.writeTimeout, second.writeTimeout);
 	}
 
 private:
+	Port(std::shared_ptr<std::queue<T>> readQueue,
+	     std::shared_ptr<std::queue<T>> writeQueue,
+	     std::shared_ptr<std::mutex> readMtx,
+	     std::shared_ptr<std::mutex> writeMtx,
+	     std::shared_ptr<std::condition_variable> readCondition,
+	     std::shared_ptr<std::condition_variable> writeCondition)
+	    : readQueue(readQueue), writeQueue(writeQueue), readMtx(readMtx),
+	      writeMtx(writeMtx), readCondition(readCondition),
+	      writeCondition(writeCondition) {}
 	std::shared_ptr<std::queue<T>> readQueue;
 	std::shared_ptr<std::queue<T>> writeQueue;
 	std::shared_ptr<std::mutex> readMtx;
@@ -81,8 +63,45 @@ private:
 };
 
 template <typename T>
+std::pair<Port<T>, Port<T>>
+Port<T>::GetPair() {
+	std::shared_ptr<std::queue<T>> queueAtoB =
+	    std::make_shared<std::queue<T>>();
+	std::shared_ptr<std::queue<T>> queueBtoA =
+	    std::make_shared<std::queue<T>>();
+	std::shared_ptr<std::mutex> mtxAtoB = std::make_shared<std::mutex>();
+	std::shared_ptr<std::mutex> mtxBtoA = std::make_shared<std::mutex>();
+	std::shared_ptr<std::condition_variable> conditionAtoB =
+	    std::make_shared<std::condition_variable>();
+	std::shared_ptr<std::condition_variable> conditionBtoA =
+	    std::make_shared<std::condition_variable>();
+	Port<T> A(queueBtoA, queueAtoB, mtxBtoA, mtxAtoB, conditionBtoA,
+	          conditionAtoB);
+	Port<T> B(queueAtoB, queueBtoA, mtxAtoB, mtxBtoA, conditionAtoB,
+	          conditionBtoA);
+	return { A, B };
+}
+
+template <typename T> Port<T>::Port(Port<T> &&other) {
+	std::unique_lock<std::mutex> locks{ other.readMtx, other.writeMtx };
+	std::lock_guard<std::mutex> readLock(other.readMtx, std::adopt_lock);
+	std::lock_guard<std::mutex> writeLock(other.writeMtx, std::adopt_lock);
+
+	swap(*this, other);
+}
+template <typename T>
+Port<T> &
+Port<T>::operator=(Port<T> other) {
+	std::unique_lock<std::mutex> locks{ other.readMtx, other.writeMtx };
+	std::lock_guard<std::mutex> readLock(other.readMtx, std::adopt_lock);
+	std::lock_guard<std::mutex> writeLock(other.writeMtx, std::adopt_lock);
+
+	swap(*this, other);
+}
+
+template <typename T>
 std::vector<T>
-DualPort<T>::Port::read(unsigned int len) {
+Port<T>::read(unsigned int len) {
 	namespace chrono = std::chrono;
 	// Read Output
 	std::vector<T> output;
@@ -121,7 +140,7 @@ DualPort<T>::Port::read(unsigned int len) {
 
 template <typename T>
 void
-DualPort<T>::Port::write(const std::vector<T> data) {
+Port<T>::write(const std::vector<T> data) {
 	// Multi-thread write saftey
 	{
 		auto lock = std::lock_guard(*writeMtx);
@@ -135,14 +154,14 @@ DualPort<T>::Port::write(const std::vector<T> data) {
 
 template <typename T>
 void
-DualPort<T>::Port::flush() {
+Port<T>::flush() {
 	this->flushRead();
 	this->flushWrite();
 }
 
 template <typename T>
 void
-DualPort<T>::Port::flushRead() {
+Port<T>::flushRead() {
 	// Multi-thread read saftey
 	auto lock = std::lock_guard(*readMtx);
 
@@ -153,7 +172,7 @@ DualPort<T>::Port::flushRead() {
 
 template <typename T>
 void
-DualPort<T>::Port::flushWrite() {
+Port<T>::flushWrite() {
 	// Multi-thread write saftey
 	auto lock = std::lock_guard(*writeMtx);
 
@@ -164,26 +183,26 @@ DualPort<T>::Port::flushWrite() {
 
 template <typename T>
 unsigned int
-DualPort<T>::Port::numberOfBytesAvailable() const {
+Port<T>::numberOfBytesAvailable() const {
 	return static_cast<unsigned int>(readQueue->size());
 }
 
 template <typename T>
 bool
-DualPort<T>::Port::isDataAvailable() const {
+Port<T>::isDataAvailable() const {
 	return !readQueue->empty();
 }
 
 template <typename T>
 bool
-DualPort<T>::Port::isConnected() const {
+Port<T>::isConnected() const {
 	return readQueue.use_count() > 1 && writeQueue.use_count() > 1;
 }
 
 template <typename T>
 void
-DualPort<T>::Port::setTimeouts(std::chrono::microseconds _readTimeout,
-                               std::chrono::microseconds _writeTimeout) {
+Port<T>::setTimeouts(std::chrono::microseconds _readTimeout,
+                     std::chrono::microseconds _writeTimeout) {
 	this->readTimeout = _readTimeout;
 	this->writeTimeout = _writeTimeout;
 }

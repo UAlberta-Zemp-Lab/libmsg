@@ -1,9 +1,11 @@
 {
     "configurations": [
         {
-            "name": "Win32",
+            "name": "MSYS2-UCRT",
+            "compilerPath": "c:/msys64/ucrt64/bin/g++",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "c:/msys64/ucrt64/include/**"
             ],
             "defines": [
                 "_DEBUG",
@@ -14,9 +16,30 @@
             "windowsSdkVersion": "10.0.22621.0",
             "cStandard": "c17",
             "cppStandard": "c++20",
-            "intelliSenseMode": "windows-msvc-x64",
-            "compileCommands": "${workspaceFolder}/build/debug/compile_commands.json"
-        }
+            "intelliSenseMode": "windows-gcc-x64",
+            "compileCommands": "${workspaceFolder}/build/ucrt/compile_commands.json",
+            "browse": {}
+        },
+        {
+            "name": "MSYS2-CLANG",
+            "compilerPath": "c:/msys64/clang64/bin/cc",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "c:/msys64/clang64/include/**",
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "_cplusplus"
+            ],
+            "windowsSdkVersion": "10.0.22621.0",
+            "cStandard": "c17",
+            "cppStandard": "c++20",
+            "intelliSenseMode": "windows-clang-x64",
+            "compileCommands": "${workspaceFolder}/build/clang/compile_commands.json",
+            "browse": {},
+        },
     ],
     "version": 4
 }
