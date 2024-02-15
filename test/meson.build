@@ -13,10 +13,12 @@ if posix
 	test('unistd', unistd)
 endif
 
+incdirTest = include_directories('include')
+
 cpp_testSources = files(
 	'MsgTest.cpp',
 )
 
-MsgTest = executable('MsgTest', cpp_testSources, include_directories: incdir, link_with: [msg_cpp])
+MsgTest = executable('MsgTest', cpp_testSources, include_directories: [incdir, incdirTest], link_with: [msg_cpp])
 
 test('MsgTest', MsgTest)
