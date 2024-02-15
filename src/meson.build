@@ -7,6 +7,9 @@ c_sources = files(
 cpp_sources = files(
 	'msg/Msg.cpp',
 	'msg/MsgHandler.cpp',
+	'msg/communicator/SerialCommunicator.cpp',
+	'msg/communicator/WorkerThread.cpp',
+	'msg/MsgLog.cpp',
 )
 
 if posix
