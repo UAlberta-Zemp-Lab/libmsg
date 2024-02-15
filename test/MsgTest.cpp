@@ -11,8 +11,8 @@ void testRead();
 void testWrite();
 void testOperators();
 
-int
-main() {
+void
+testMsg() {
 	testConstructors();
 	testSet();
 	testRead();

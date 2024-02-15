@@ -6,6 +6,7 @@ c_sources = files(
 
 cpp_sources = files(
 	'msg/Msg.cpp',
+	'msg/MsgHandler.cpp',
 )
 
 if posix
