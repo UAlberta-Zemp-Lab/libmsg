@@ -23,6 +23,7 @@ testMsg() {
 void
 testConstructors() {
 	uint16_t type = 0xABCD;
+	uint16_t id = 11;
 	uint16_t length = 25;
 	std::vector<uint8_t> data = std::vector<uint8_t>();
 	std::vector<uint8_t> bytes = std::vector<uint8_t>();
@@ -33,42 +34,57 @@ testConstructors() {
 	bytes.insert(bytes.end(), {
 				      static_cast<uint8_t>(type & 0xff),
 				      static_cast<uint8_t>(type >> 8),
+				      static_cast<uint8_t>(id & 0xff),
+				      static_cast<uint8_t>(id >> 8),
 				      static_cast<uint8_t>(length & 0xff),
 				      static_cast<uint8_t>(length >> 8),
 				  });
 	bytes.insert(bytes.end(), data.begin(), data.end());
 
 	assert(msg.type() == msg::MsgType::ERR);
+	assert(msg.id() == 0);
 	assert(msg.length() == 0);
 	assert(msg.data().empty());
 
 	msg = msg::Msg();
 	assert(msg.type() == msg::MsgType::ERR);
+	assert(msg.id() == 0);
 	assert(msg.length() == 0);
 	assert(msg.data().empty());
 
 	msg = msg::Msg(type);
 	assert(msg.type() == type);
+	assert(msg.id() == 0);
 	assert(msg.length() == 0);
 	assert(msg.data().empty());
 
-	msg = msg::Msg(type, length);
+	msg = msg::Msg(type, id);
 	assert(msg.type() == type);
+	assert(msg.id() == id);
+	assert(msg.length() == 0);
+	assert(msg.data().empty());
+
+	msg = msg::Msg(type, id, length);
+	assert(msg.type() == type);
+	assert(msg.id() == id);
 	assert(msg.length() == length);
 	assert(msg.data() == std::vector<uint8_t>(length, 0));
 
-	msg = msg::Msg(type, length, data);
+	msg = msg::Msg(type, id, length, data);
 	assert(msg.type() == type);
+	assert(msg.id() == id);
 	assert(msg.length() == length);
 	assert(msg.data() == data);
 
 	msg = msg::Msg(bytes);
 	assert(msg.type() == type);
+	assert(msg.id() == id);
 	assert(msg.length() == length);
 	assert(msg.data() == data);
 
 	msg = msg::Msg(bytes.begin(), bytes.end());
 	assert(msg.type() == type);
+	assert(msg.id() == id);
 	assert(msg.length() == length);
 	assert(msg.data() == data);
 }
@@ -76,6 +92,7 @@ testConstructors() {
 void
 testSet() {
 	uint16_t type = 0xABCD;
+	uint16_t id = 11;
 	uint16_t length = 25;
 	std::vector<uint8_t> data = std::vector<uint8_t>();
 	msg::Msg msg;
@@ -86,24 +103,35 @@ testSet() {
 	msg = msg::Msg();
 	msg.setType(type);
 	assert(msg.type() == type);
+	assert(msg.id() == 0);
+	assert(msg.length() == 0);
+	assert(msg.data().empty());
+
+	msg = msg::Msg();
+	msg.setId(id);
+	assert(msg.type() == msg::MsgType::ERR);
+	assert(msg.id() == id);
 	assert(msg.length() == 0);
 	assert(msg.data().empty());
 
 	msg = msg::Msg();
 	msg.setData(data, length);
 	assert(msg.type() == msg::MsgType::ERR);
+	assert(msg.id() == 0);
 	assert(msg.length() == length);
 	assert(msg.data() == data);
 
 	msg = msg::Msg();
 	msg.setData(data.begin(), data.end(), length);
 	assert(msg.type() == msg::MsgType::ERR);
+	assert(msg.id() == 0);
 	assert(msg.length() == length);
 	assert(msg.data() == data);
 }
 void
 testRead() {
 	uint16_t type = 0xABCD;
+	uint16_t id = 11;
 	uint16_t length = 25;
 	std::vector<uint8_t> header = std::vector<uint8_t>();
 	std::vector<uint8_t> data = std::vector<uint8_t>();
@@ -113,6 +141,8 @@ testRead() {
 	header = std::vector<uint8_t>{
 		static_cast<uint8_t>(type & 0xff),
 		static_cast<uint8_t>(type >> 8),
+		static_cast<uint8_t>(id & 0xff),
+		static_cast<uint8_t>(id >> 8),
 		static_cast<uint8_t>(length & 0xff),
 		static_cast<uint8_t>(length >> 8),
 	};
@@ -124,48 +154,56 @@ testRead() {
 	msg = msg::Msg();
 	msg.readMsg(bytes);
 	assert(msg.type() == type);
+	assert(msg.id() == id);
 	assert(msg.length() == length);
 	assert(msg.data() == data);
 
 	msg = msg::Msg();
 	msg.readMsg(bytes.begin(), bytes.end());
 	assert(msg.type() == type);
+	assert(msg.id() == id);
 	assert(msg.length() == length);
 	assert(msg.data() == data);
 
 	msg = msg::Msg();
 	msg.readHeader(header);
 	assert(msg.type() == type);
+	assert(msg.id() == id);
 	assert(msg.length() == length);
 	assert(msg.data() == std::vector<uint8_t>(length, 0));
 
 	msg = msg::Msg();
 	msg.readHeader(header.begin(), header.end());
 	assert(msg.type() == type);
+	assert(msg.id() == id);
 	assert(msg.length() == length);
 	assert(msg.data() == std::vector<uint8_t>(length, 0));
 
 	msg = msg::Msg(header);
 	msg.readData(data);
 	assert(msg.type() == type);
+	assert(msg.id() == id);
 	assert(msg.length() == length);
 	assert(msg.data() == data);
 
-	msg = msg::Msg(type, length);
+	msg = msg::Msg(type, id, length);
 	msg.readData(data);
 	assert(msg.type() == type);
+	assert(msg.id() == id);
 	assert(msg.length() == length);
 	assert(msg.data() == data);
 
-	msg = msg::Msg(type, length);
+	msg = msg::Msg(type, id, length);
 	msg.readData(data.begin(), data.end());
 	assert(msg.type() == type);
+	assert(msg.id() == id);
 	assert(msg.length() == length);
 	assert(msg.data() == data);
 }
 void
 testWrite() {
 	uint16_t type = 0xABCD;
+	uint16_t id = 11;
 	uint16_t length = 25;
 	std::vector<uint8_t> header = std::vector<uint8_t>();
 	std::vector<uint8_t> data = std::vector<uint8_t>();
@@ -175,6 +213,8 @@ testWrite() {
 	header = std::vector<uint8_t>{
 		static_cast<uint8_t>(type & 0xff),
 		static_cast<uint8_t>(type >> 8),
+		static_cast<uint8_t>(id & 0xff),
+		static_cast<uint8_t>(id >> 8),
 		static_cast<uint8_t>(length & 0xff),
 		static_cast<uint8_t>(length >> 8),
 	};
@@ -183,7 +223,7 @@ testWrite() {
 	bytes.insert(bytes.end(), header.begin(), header.end());
 	bytes.insert(bytes.end(), data.begin(), data.end());
 
-	msg = msg::Msg(type, length, data);
+	msg = msg::Msg(type, id, length, data);
 
 	assert(msg.writeMsg() == bytes);
 	assert(msg.writeHeader() == header);
@@ -192,6 +232,7 @@ testWrite() {
 void
 testOperators() {
 	uint16_t type = 0xABCD;
+	uint16_t id = 11;
 	uint16_t length = 25;
 	std::vector<uint8_t> header = std::vector<uint8_t>();
 	std::vector<uint8_t> data = std::vector<uint8_t>();
@@ -202,6 +243,8 @@ testOperators() {
 	header = std::vector<uint8_t>{
 		static_cast<uint8_t>(type & 0xff),
 		static_cast<uint8_t>(type >> 8),
+		static_cast<uint8_t>(id & 0xff),
+		static_cast<uint8_t>(id >> 8),
 		static_cast<uint8_t>(length & 0xff),
 		static_cast<uint8_t>(length >> 8),
 	};
@@ -210,10 +253,10 @@ testOperators() {
 	bytes.insert(bytes.end(), header.begin(), header.end());
 	bytes.insert(bytes.end(), data.begin(), data.end());
 
-	msg1 = msg::Msg(type, length, data);
+	msg1 = msg::Msg(type, id, length, data);
 	assert(msg1 == bytes);
 
 	msg1 = msg::Msg(bytes);
-	msg2 = msg::Msg(type, length, data);
+	msg2 = msg::Msg(type, id, length, data);
 	assert(msg1 == msg2);
 }

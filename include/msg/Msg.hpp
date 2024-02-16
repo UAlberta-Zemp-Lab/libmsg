@@ -19,20 +19,25 @@ class Msg {
 public:
 	static constexpr size_t sizeOfType = sizeof(MsgType::type);
 	static constexpr size_t sizeOfLength = sizeof(uint16_t);
-	static constexpr size_t sizeOfHeader = sizeOfType + sizeOfLength;
+	static constexpr size_t sizeOfId = sizeof(uint16_t);
+	static constexpr size_t sizeOfHeader =
+	    sizeOfType + sizeOfLength + sizeOfId;
 
 	Msg();
 	Msg(uint16_t type);
-	Msg(uint16_t type, uint16_t length);
-	Msg(uint16_t type, uint16_t length, const byteArray &data);
+	Msg(uint16_t type, uint16_t id);
+	Msg(uint16_t type, uint16_t id, uint16_t length);
+	Msg(uint16_t type, uint16_t length, uint16_t id, const byteArray &data);
 	Msg(const byteArray &bytes);
 	Msg(byteConstIter, byteConstIter);
 
 	uint16_t type() const;
+	uint16_t id() const;
 	uint16_t length() const;
 	const byteArray &data() const;
 
 	void setType(uint16_t type);
+	void setId(uint16_t id);
 	void setData(const byteArray &, uint16_t length);
 	void setData(byteConstIter, byteConstIter, uint16_t length);
 
@@ -53,6 +58,7 @@ public:
 
 private:
 	uint16_t _type;
+	uint16_t _id;
 	byteArray _data;
 };
 } // namespace msg

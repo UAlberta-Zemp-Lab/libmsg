@@ -15,9 +15,11 @@ using byteConstIter = byteArray::const_iterator;
 namespace msg {
 Msg::Msg() : Msg::Msg(MsgType::ERR) {}
 Msg::Msg(uint16_t type) : Msg(type, 0) {}
-Msg::Msg(uint16_t type, uint16_t length)
-    : _type(type), _data(byteArray(length, 0)) {}
-Msg::Msg(uint16_t type, uint16_t length, const byteArray &data) : Msg(type, 0) {
+Msg::Msg(uint16_t type, uint16_t length) : Msg(type, length, 0) {}
+Msg::Msg(uint16_t type, uint16_t id, uint16_t length)
+    : _type(type), _id(id), _data(byteArray(length, 0)) {}
+Msg::Msg(uint16_t type, uint16_t id, uint16_t length, const byteArray &data)
+    : Msg(type, id, 0) {
 	setData(data, length);
 }
 Msg::Msg(const byteArray &bytes) : Msg(bytes.begin(), bytes.end()) {}
@@ -28,6 +30,10 @@ Msg::Msg(byteConstIter begin, byteConstIter end) : Msg() {
 uint16_t
 Msg::type() const {
 	return _type;
+}
+uint16_t
+Msg::id() const {
+	return _id;
 }
 uint16_t
 Msg::length() const {
@@ -41,6 +47,10 @@ Msg::data() const {
 void
 Msg::setType(uint16_t type) {
 	_type = type;
+}
+void
+Msg::setId(uint16_t id) {
+	_id = id;
 }
 void
 Msg::setData(const byteArray &data, uint16_t length) {
@@ -83,11 +93,14 @@ Msg::readHeader(byteConstIter begin, byteConstIter end) {
 
 	uint16_t type = (*(begin + 1) << 8) | (*begin);
 	std::advance(begin, 2);
+	uint16_t id = (*(begin + 1) << 8) | (*begin);
+	std::advance(begin, 2);
 	uint16_t _length = (*(begin + 1) << 8) | (*begin);
 	std::advance(begin, 2);
 
 	_data.resize(_length);
 	_type = type;
+	_id = id;
 }
 
 void
@@ -109,6 +122,8 @@ Msg::writeHeader() const {
 	return byteArray{
 		static_cast<uint8_t>(_type & 0xff),
 		static_cast<uint8_t>(_type >> 8),
+		static_cast<uint8_t>(_id & 0xff),
+		static_cast<uint8_t>(_id >> 8),
 		static_cast<uint8_t>(length() & 0xff),
 		static_cast<uint8_t>(length() >> 8),
 	};
@@ -133,5 +148,6 @@ Msg::operator byteArray() const { return writeMsg(); }
 bool
 msg::Msg::operator==(const Msg &other) const {
 	return (this == &other)
-	       || ((_type == other._type) && (_data == other._data));
+	       || ((_type == other._type) && (_id == other._id)
+	           && (_data == other._data));
 }
