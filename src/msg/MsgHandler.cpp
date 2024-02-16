@@ -41,7 +41,6 @@ msg::MsgHandler::readMsg(Stream<uint8_t> &stream) {
 
 		if (readMsg.length() > 0) {
 			try {
-				stream << Msg(MsgType::CONTINUE);
 				readMsg.readData(stream.read(readMsg.length()));
 			} catch (std::bad_alloc &) {
 				stream << Msg(MsgType::ERR);
@@ -73,36 +72,9 @@ msg::MsgHandler::readMsg(Stream<uint8_t> &stream) {
 void
 msg::MsgHandler::writeMsg(const msg::Msg &writeMsg, Stream<uint8_t> &stream) {
 	for (unsigned int tries = retries + 1; tries; tries--) {
-		stream << writeMsg.writeHeader();
+		stream << writeMsg.writeMsg();
 
 		uint16_t response;
-		try {
-			response = MsgHandler::checkResponse(stream);
-		} catch (const std::exception &x) {
-			throw std::runtime_error(std::string("No response: ")
-			                         + x.what());
-		}
-		switch (response) {
-		case MsgType::ACK:
-			return;
-		case MsgType::CONTINUE:
-			break;
-		case MsgType::RETRY:
-			continue;
-		case MsgType::STOP:
-			throw std::runtime_error("Received Message Stop");
-		case MsgType::ERR:
-			throw std::runtime_error("Message Error");
-		default: {
-			if (stream.options.WritePriority
-			    == StreamOptions::WritePriority::Master) {
-				continue;
-			}
-			throw std::runtime_error("sWrite");
-		}
-		}
-
-		stream << writeMsg.data();
 		try {
 			response = MsgHandler::checkResponse(stream);
 		} catch (const std::exception &x) {
