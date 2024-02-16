@@ -4,6 +4,7 @@ project('libmsg',
 	version: files('./VERSION'),
 	default_options: [
 		'c_std=c99',
+		'cpp_std=c++20',
 		'debug=false',
 		'default_library=both',
 		'optimization=s',
