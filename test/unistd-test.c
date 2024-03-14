@@ -108,11 +108,26 @@ test_msg_stop(void)
 	assert_msg_equal(&m1, &m2);
 }
 
+static void
+test_buildMessage()
+{
+	Msg message = { .type = MSG_CONTINUE, .length = 0 };
+
+	if( buildMessage( &message, 0, 0 ) )
+	{
+		msg_free(&message);
+	}
+}
+
 int
 main(void)
 {
 	/* hack around meson's broken buffering */
 	setvbuf(stdout, NULL, _IONBF, 0);
+
+	printf("test\n");
+
+	test_buildMessage();
 
 	test_tx_rx();
 	test_msg_stop();
