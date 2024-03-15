@@ -55,6 +55,7 @@ printMessage(const Msg *message)
 		printf("%d: 0x%X\n", i, *msgData);
 		msgData++;
 	}
+	printf("\n");
 }
 
 bool
@@ -66,28 +67,28 @@ buildMessage(Msg *message, uint16_t payloadSize, uint8_t *payload)
 	if (!msg_alloc(message)) {
 		return false;
 	}
-
+	
+	// Handle message->data as a uint8 pointer
 	uint8_t *data = (uint8_t *)message->data;
 
-	*data = STX;
-	data++;
+	data[0] = STX;
 
-	*data = ( length >> 8 ) & 0xff;
-	data++;
-	*data = length & 0xff;
-	data++;
+	// Pack length to two bytes
+	data[1] = ( length >> 8 ) & 0xff;
+	data[2] = length & 0xff;
 
-	*data = ( message->type >> 8 ) & 0xff;
-	data++;
-	*data = message->type & 0xff;
-	data++;
+	// Pack type to two bytes
+	data[3] = ( message->type >> 8 ) & 0xff;
+	data[4] = message->type & 0xff;
 
-	*data = calculateChecksum(message->data, length - 2);
-	data++;
+	for( int i = 0; i < payloadSize; i++ )
+	{
+		data[i+5] = payload[i];
+	}
 
-	*data = ETX;
+	data[length - 2] = calculateChecksum(message->data, length - 2);
 
-	payload++;
+	data[length - 1] = ETX;
 
 	printMessage(message);
 

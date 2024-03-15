@@ -113,7 +113,9 @@ test_buildMessage()
 {
 	Msg message = { .type = MSG_CONTINUE, .length = 0 };
 
-	if( buildMessage( &message, 0, 0 ) )
+	uint8_t payload[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+
+	if( buildMessage( &message, 8, payload ) )
 	{
 		msg_free(&message);
 	}

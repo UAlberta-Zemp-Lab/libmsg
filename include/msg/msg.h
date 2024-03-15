@@ -27,17 +27,15 @@ LIBMSG_API void msg_free(Msg *);
  * Allocates memory in message and constructs the message in the following order
  *
  * - STX [1 Byte]
- * - Message Size [2 Bytes] // From STX -> ETX
+ * - Message Length [2 Bytes] // From STX -> ETX
  * - Message Type [2 Bytes]
- * - Payload [dataSize Bytes]
+ * - Payload [payloadLength Bytes]
  * - Checksum [1 Byte]
  * - ETX [1 Byte]
  *
- * message->length will be set to the total size
- *
- * Total size = 7 + dataSize
+ * Total length = 7 + payloadLength
  */
-LIBMSG_API bool buildMessage(Msg *msg, uint16_t dataSize, uint8_t *data);
+LIBMSG_API bool buildMessage(Msg *msg, uint16_t payloadLength, uint8_t *payload);
 
 #ifdef __cplusplus
 }
