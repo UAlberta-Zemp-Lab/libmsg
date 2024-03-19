@@ -3,8 +3,7 @@ project('libmsg',
 	license: 'ISC',
 	version: files('./VERSION'),
 	default_options: [
-		'c_std=c99',
-		'debug=false',
+		'debug=true',
 		'default_library=both',
 		'optimization=s',
 		'warning_level=3',
@@ -28,6 +27,12 @@ if posix
 	c_sources += files(
 		# Backends
 		'src/unistd/unistd.c',
+	)
+elif win32
+	c_sources += files(
+		# Backends
+		'src/w32serial/device.c',
+		'src/w32serial/w32serial.c',
 	)
 endif
 
