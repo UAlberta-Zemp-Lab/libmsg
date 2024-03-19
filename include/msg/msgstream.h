@@ -3,6 +3,7 @@
 #define _MSGSTREAM_H
 
 #include <msg/platform.h>
+#include <msg/msg.h>
 
 #include <stdbool.h>
 #include <stddef.h>

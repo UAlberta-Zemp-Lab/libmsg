@@ -29,6 +29,16 @@ if posix
         'src/unistd/connect.c',
         'src/unistd/unistd.c',
     )
+elif win32
+    c_sources += files(
+        'src/w32serial/available.c',
+        'src/w32serial/connect.c',
+        'src/w32serial/flush.c',
+        'src/w32serial/read.c',
+        'src/w32serial/timeout.c',
+        'src/w32serial/w32serial.c',
+        'src/w32serial/write.c',
+    )
 endif
 
 msg = library('msg', c_sources, install: true, include_directories: incdir)
