@@ -1,34 +1,30 @@
 /* See LICENSE file for copyright and license details. */
 #include <Stream.h>
-#include <core_pins.h>
 #include <msg/arduino.h>
-#include <msg/msg.h>
 #include <msg/msgstream.h>
 #include <stdbool.h>
 #include <stdint.h>
 
-static bool
-aread(Stream *s, uint8_t *b, size_t n)
+static MSG_READ_FN(aread)
 {
-	return s->readBytes(b, n) == n;
+	Stream *d = (Stream *)ms->dev;
+	return d->readBytes(data, count) == count;
 }
 
-static bool
-awrite(Stream *s, uint8_t *b, size_t n)
+static MSG_WRITE_FN(awrite)
 {
-	return s->write(b, n) == n;
+	Stream *d = (Stream *)ms->dev;
+	return d->write(data, count) == count;
 }
 
-static bool
-available(Stream *s)
+static MSG_AVAILABLE_FN(available)
 {
-	return s->available() != 0;
+	Stream *d = (Stream *)ms->dev;
+	return d->available() != 0;
 }
 
 void
 msg_arduino_init(MsgStream *ms, Stream *s, uint8_t flags)
 {
-	msg_stream_init(ms, s, flags, 10, (bool (*)(void *))available,
-	                (bool (*)(void *, void *, size_t))awrite,
-	                (bool (*)(void *, void *, size_t))aread);
+	msg_stream_init(ms, s, flags, 10, aread, awrite, available);
 }

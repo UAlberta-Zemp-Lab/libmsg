@@ -8,28 +8,27 @@
 #include <stddef.h>
 #include <unistd.h>
 
-static bool
-uwrite(MsgUnistdDev *d, void *b, size_t n)
+static MSG_WRITE_FN(uwrite)
 {
-	size_t r;
-	while ((r = (size_t)write(d->wfd, b, n)) == (size_t)-1
-	       && errno == EINTR)
+	MsgUnistdDev *d = (MsgUnistdDev *)ms->dev;
+	ptrdiff_t r;
+	while ((r = write(d->wfd, data, count)) == -1 && errno == EINTR)
 		;
-	return r == n;
+	return r == (ptrdiff_t)count;
 }
 
-static bool
-uread(MsgUnistdDev *d, void *b, size_t n)
+static MSG_READ_FN(uread)
 {
-	size_t r;
-	while ((r = (size_t)read(d->rfd, b, n)) == (size_t)-1 && errno == EINTR)
+	MsgUnistdDev *d = (MsgUnistdDev *)ms->dev;
+	ptrdiff_t r;
+	while ((r = read(d->rfd, data, count)) == -1 && errno == EINTR)
 		;
-	return r == n;
+	return r == (ptrdiff_t)count;
 }
 
-static bool
-available(MsgUnistdDev *d)
+static MSG_AVAILABLE_FN(available)
 {
+	MsgUnistdDev *d = (MsgUnistdDev *)ms->dev;
 	struct pollfd pfd = { .fd = d->rfd, .events = POLLIN };
 	/* could have a variable timeout but its a bit clunky */
 	int r = poll(&pfd, 1, 1);
@@ -42,7 +41,5 @@ available(MsgUnistdDev *d)
 void
 msg_unistd_init(MsgStream *s, MsgUnistdDev *d, uint8_t flags)
 {
-	msg_stream_init(s, d, flags, 10, (bool (*)(void *))available,
-	                (bool (*)(void *, void *, size_t))uwrite,
-	                (bool (*)(void *, void *, size_t))uread);
+	msg_stream_init(s, d, flags, 10, uread, uwrite, available);
 }

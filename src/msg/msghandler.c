@@ -6,16 +6,14 @@
 
 void
 msg_stream_init(MsgStream *s, void *dev, uint8_t flags, uint32_t retries,
-                bool (*available)(void *),
-                bool (*write)(void *, void *, size_t),
-                bool (*read)(void *, void *, size_t))
+                MsgReadFn *read, MsgWriteFn *write, MsgAvailableFn *available)
 {
-	s->dev = dev;
-	s->flags = flags;
-	s->retries = retries;
+	s->read      = read;
+	s->write     = write;
 	s->available = available;
-	s->write = write;
-	s->read = read;
+	s->dev       = dev;
+	s->retries   = retries;
+	s->flags     = flags;
 }
 
 /*
@@ -26,7 +24,7 @@ msg_stream_init(MsgStream *s, void *dev, uint8_t flags, uint32_t retries,
 static bool
 read_bytes(MsgStream *s, void *b, size_t n)
 {
-	return s->read(s->dev, b, n);
+	return s->read(s, b, n);
 }
 
 /*
@@ -65,7 +63,7 @@ read_data(MsgStream *s, Msg *m)
 static bool
 write_bytes(MsgStream *s, void *b, size_t n)
 {
-	return s->write(s->dev, b, n);
+	return s->write(s, b, n);
 }
 
 /*

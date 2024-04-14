@@ -32,7 +32,7 @@ msg_pipe(Msg *txm, Msg *rxm, bool expected_fail)
 		MsgUnistdDev d = { .rfd = child[0], .wfd = parent[1] };
 		MsgStream s;
 		msg_unistd_init(&s, &d, 0);
-		if (!s.available(s.dev))
+		if (!s.available(&s))
 			die("parent has no data available");
 		if (!msg_read(&s, rxm) && !expected_fail)
 			die("parent failed to read msg");
