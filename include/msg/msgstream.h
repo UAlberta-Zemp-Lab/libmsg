@@ -2,6 +2,8 @@
 #ifndef _MSGSTREAM_H
 #define _MSGSTREAM_H
 
+#include <msg/platform.h>
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
