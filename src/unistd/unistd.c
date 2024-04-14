@@ -14,7 +14,7 @@ static MSG_WRITE_FN(uwrite)
 	ptrdiff_t r;
 	while ((r = write(d->wfd, data, count)) == -1 && errno == EINTR)
 		;
-	return r == (ptrdiff_t)count;
+	return r >= 0 && (size_t)r == count;
 }
 
 static MSG_READ_FN(uread)
@@ -23,7 +23,7 @@ static MSG_READ_FN(uread)
 	ptrdiff_t r;
 	while ((r = read(d->rfd, data, count)) == -1 && errno == EINTR)
 		;
-	return r == (ptrdiff_t)count;
+	return r >= 0 && (size_t)r == count;
 }
 
 static MSG_AVAILABLE_FN(available)
