@@ -26,6 +26,7 @@ c_sources = files(
 
 if posix
     c_sources += files(
+        'src/unistd/connect.c',
         'src/unistd/unistd.c',
     )
 endif

@@ -19,6 +19,8 @@ extern "C" {
 /* Prototypes */
 LIBMSG_API void msg_unistd_init(MsgStream *, MsgUnistdDev *, uint8_t flags);
 
+LIBMSG_API bool msg_unistd_serial_connect(MsgUnistdDev *, const char *);
+
 #ifdef __cplusplus
 }
 #endif
