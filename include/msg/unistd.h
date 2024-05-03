@@ -7,11 +7,10 @@
 #include <msg/msg.h>
 #include <msg/msgstream.h>
 #include <stdbool.h>
-#include <stdio.h>
+#include <stddef.h>
+#include <unistd.h>
 
-typedef struct {
-	int wfd, rfd;
-} MsgUnistdDev;
+typedef struct { int wfd, rfd; } MsgUnistdDev;
 
 #ifdef __cplusplus
 extern "C" {
